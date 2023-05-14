@@ -49,4 +49,10 @@ void test_vector_basic() {
     int* m_data_ptr = static_cast<int*>(m_data.data());
     std::vector<int> correct_vals = {0, 1, 2, 10, 20, 30, 3, 4, 5, 6};
     assert_array_equals(m_data_ptr, correct_vals.data(), correct_vals.size());
+
+    boost::any val = m_data.get(3);
+    assert( boost::any_cast<int>(val) == 10);
+
+    val = m_i_data.get(2);
+    assert( boost::any_cast<int>(val) == 30 );
 }

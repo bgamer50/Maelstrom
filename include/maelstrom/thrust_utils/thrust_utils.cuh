@@ -11,6 +11,7 @@
 #include <thrust/scan.h>
 #include <thrust/transform_scan.h>
 #include <thrust/adjacent_difference.h>
+#include <thrust/gather.h>
 
 #include <thrust/device_ptr.h>
 #include <thrust/device_vector.h>
@@ -32,6 +33,15 @@
 #include "thrust_utils/execution.cuh"
 
 namespace maelstrom {
+
+    template <typename T>
+    struct unary_plus_op : public thrust::unary_function<T, T> {
+        T plus_val;
+        
+        __device__ __host__ T operator()(T in) const {
+            return in + plus_val;
+        }
+    };
 
     struct plus_op : public thrust::unary_function<thrust::tuple<size_t,size_t>,size_t> {
         __device__ size_t operator()(thrust::tuple<size_t, size_t> t) const {

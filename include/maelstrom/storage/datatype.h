@@ -12,11 +12,18 @@ namespace maelstrom {
         primitive_t prim_type;
         std::function<boost::any(void* data)> deserialize;
         std::function<boost::any(boost::any)> serialize = [](boost::any a){return a;};
+
+        bool operator==(const dtype_t& other);
+        bool operator!=(const dtype_t& other);
     };
 
     size_t size_of(primitive_t& prim_type);
 
     inline size_t size_of(dtype_t& dtype) { return size_of(dtype.prim_type); }
+
+    primitive_t prim_type_of(boost::any& a);
+
+    std::pair<std::vector<unsigned char>, primitive_t> any_to_bytes(boost::any& a);
 
     extern dtype_t uint64;
     extern dtype_t uint32;

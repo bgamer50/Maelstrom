@@ -58,6 +58,10 @@ namespace maelstrom {
     ) {}
 
     vector::vector(vector& orig) {
+        if(&orig == this) {
+            return;
+        }
+
         this->mem_type = orig.mem_type;
         this->dtype = orig.dtype;
         this->filled_size = orig.filled_size;
@@ -75,22 +79,46 @@ namespace maelstrom {
     }
 
     vector::vector(vector&& other) noexcept {
-        this->data_ptr = std::move(other.data_ptr);
-        this->filled_size = std::move(other.filled_size);
-        this->reserved_size = std::move(other.reserved_size);
-        this->dtype = std::move(other.dtype);
-        this->mem_type = std::move(other.mem_type);
+        if(&other == this) {
+            return;
+        }
+
+        if(!this->view && this->reserved_size > 0) {
+            this->clear();
+        }
+
+        this->data_ptr = other.data_ptr;
+        this->filled_size = other.filled_size;
+        this->reserved_size = other.reserved_size;
+        this->dtype = other.dtype;
+        this->mem_type = other.mem_type;
         this->view = other.view;
+
+        other.data_ptr = nullptr;
+        other.filled_size = 0;
+        other.reserved_size = 0;
         other.view = true;
     }
     
     vector& vector::operator=(vector&& other) noexcept {
-        this->data_ptr = std::move(other.data_ptr);
-        this->filled_size = std::move(other.filled_size);
-        this->reserved_size = std::move(other.reserved_size);
-        this->dtype = std::move(other.dtype);
-        this->mem_type = std::move(other.mem_type);
+        if(&other == this) {
+            return *this;
+        }
+
+        if(!this->view && this->reserved_size > 0) {
+            this->clear();
+        }
+
+        this->data_ptr = other.data_ptr;
+        this->filled_size = other.filled_size;
+        this->reserved_size = other.reserved_size;
+        this->dtype = other.dtype;
+        this->mem_type = other.mem_type;
         this->view = other.view;
+
+        other.data_ptr = nullptr;
+        other.filled_size = 0;
+        other.reserved_size = 0;
         other.view = true;
 
         return *this;

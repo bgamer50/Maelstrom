@@ -4,6 +4,7 @@
 #include <cuda_runtime.h>
 
 #include <sstream>
+#include <iostream>
 
 namespace maelstrom {
 
@@ -12,7 +13,12 @@ namespace maelstrom {
 
         switch(this->mem_type) {
             case HOST: {
-                return static_cast<void*>(new char[N * dtype_size]);
+                void* ptr;
+                cudaMallocManaged(&ptr, dtype_size * N);
+                cudaMemAdvise(ptr, dtype_size * N, cudaMemAdviseSetPreferredLocation, cudaCpuDeviceId);
+                cudaDeviceSynchronize();
+                maelstrom::cuda::cudaCheckErrors("vector alloc device memory");
+                return ptr;
             }
             case DEVICE: {
                 void* ptr;
@@ -45,7 +51,11 @@ namespace maelstrom {
     void maelstrom::vector::dealloc(void* ptr) {
         switch(this->mem_type) {
             case HOST: {
-                delete static_cast<char*>(ptr);
+                cudaFree(ptr);
+                cudaDeviceSynchronize();
+                std::stringstream sx;
+                sx << "vector dealloc host-advised managed memory (" << this->name << ")";
+                maelstrom::cuda::cudaCheckErrors(sx.str());
                 return;
             }
             case MANAGED: {
@@ -75,7 +85,10 @@ namespace maelstrom {
 
     // Copies from src (first arg) to dst (second arg) using cudaMemcpy.
     void maelstrom::vector::copy(void* src, void* dst, size_t size) {
+        if(src == dst) return;
+
         cudaMemcpy(dst, src, maelstrom::size_of(this->dtype) * size, cudaMemcpyDefault);
+        cudaDeviceSynchronize();
         maelstrom::cuda::cudaCheckErrors("TypeErasedVector copy");
     }
 

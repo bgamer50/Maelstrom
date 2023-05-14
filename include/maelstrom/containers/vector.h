@@ -64,7 +64,11 @@ namespace maelstrom {
             void insert(size_t ix_start, vector& new_elements);
 
             inline void erase(){} // single erase, range erase
-            inline void get(){} // single get, range get
+            
+            /*
+                Gets the value at the given index.
+            */
+            boost::any get(size_t i);
 
             /*
                 Empties the contents of this vector and frees any reserved memory.
@@ -77,6 +81,8 @@ namespace maelstrom {
             void print();
             
             inline size_t size() { return this->filled_size; }
+
+            inline bool empty() { return this->filled_size > 0; }
 
             inline void* data() {
                 return this->data_ptr;
@@ -109,7 +115,31 @@ namespace maelstrom {
                 Creates a copy of this vector with the given memory type.
             */
             vector to(maelstrom::storage mem_type);
+            
 
     };
+
+    /*
+        If the current vector is already a host vector, returns a non-owning view of the current vector (no data is copied).
+        If it is not a host vector, it creates a copy of the vector on the host and returns it.
+    */
+    maelstrom::vector as_host_vector(maelstrom::vector& vec);
+
+    /*
+        If the current vector is already a device vector, returns a non-owning view of the current vector (no data is copied).
+        If it is not a device vector, it creates a copy of the vector on the device and returns it.
+    */
+    maelstrom::vector as_device_vector(maelstrom::vector& vec);
+
+    /*
+        Makes a new vector with the same memory type and data type as the given vector.
+        
+    */
+   inline maelstrom::vector make_vector_like(maelstrom::vector& vec) {
+        return maelstrom::vector(
+            vec.get_mem_type(),
+            vec.get_dtype()
+        );
+   }
 
 }

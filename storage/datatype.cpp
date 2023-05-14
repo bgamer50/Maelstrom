@@ -25,6 +25,71 @@ namespace maelstrom {
         throw std::runtime_error("Invalid type");
     }
 
+    primitive_t prim_type_of(boost::any& a) {
+        const std::type_info& t = a.type();
+        if(t == typeid(uint64_t)) return primitive_t::UINT64;
+        if(t == typeid(uint32_t)) return primitive_t::UINT32;
+        if(t == typeid(uint8_t)) return primitive_t::UINT8;
+        if(t == typeid(int64_t)) return primitive_t::INT64;
+        if(t == typeid(int32_t)) return primitive_t::INT32;
+        if(t == typeid(int8_t)) return primitive_t::INT8;
+        if(t == typeid(double)) return primitive_t::FLOAT64;
+        if(t == typeid(float)) return primitive_t::FLOAT32;
+    }
+
+    std::pair<std::vector<unsigned char>, primitive_t> any_to_bytes(boost::any& a) {
+        primitive_t prim_type = prim_type_of(a);
+        std::vector<unsigned char> bytes(size_of(prim_type));
+        void* data = bytes.data();
+
+        switch(prim_type) {
+            case UINT64: {
+                *static_cast<uint64_t*>(data) = boost::any_cast<uint64_t>(a);
+                break;
+            }
+            case UINT32: {
+                *static_cast<uint32_t*>(data) = boost::any_cast<uint32_t>(a);
+                break;
+            }
+            case UINT8: {
+                *static_cast<uint8_t*>(data) = boost::any_cast<uint8_t>(a);
+                break;
+            }
+            case INT64: {
+                *static_cast<int64_t*>(data) = boost::any_cast<int64_t>(a);
+                break;
+            }
+            case INT32: {
+                *static_cast<int32_t*>(data) = boost::any_cast<int32_t>(a);
+                break;
+            }
+            case INT8: {
+                *static_cast<int8_t*>(data) = boost::any_cast<uint8_t>(a);
+                break;
+            }
+            case FLOAT64: {
+                *static_cast<double*>(data) = boost::any_cast<double>(a);
+                break;
+            }
+            case FLOAT32: {
+                *static_cast<float*>(data) = boost::any_cast<float>(a);
+                break;
+            }
+            default:
+                throw std::runtime_error("invalid primitive type provided to any_to_bytes");
+        }
+
+        return std::make_pair(bytes, prim_type);
+    }
+
+    bool dtype_t::operator==(const dtype_t& other) {
+        return (other.name == this->name) && (other.prim_type == this->prim_type);
+    }
+
+    bool dtype_t::operator!=(const dtype_t& other) {
+        return (other.name != this->name) || (other.prim_type != this->prim_type);
+    }
+
     dtype_t uint64{
         "uint64",
         primitive_t::UINT64,

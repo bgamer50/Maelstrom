@@ -26,7 +26,11 @@ add_library(
 
     # cuda
     containers/vector_malloc.cu
+    containers/vector_access.cu
     algorithms/remove_if.cu
+    algorithms/increment.cu
+    algorithms/select.cu
+    algorithms/set.cu
 )
 
 target_compile_options(
@@ -71,3 +75,6 @@ endfunction()
 
 AddMaelstromTest(test_vector.exe tests/test_vector.cpp)
 AddMaelstromTest(test_remove.exe tests/test_remove.cpp)
+AddMaelstromTest(test_increment.exe tests/test_increment.cpp)
+AddMaelstromTest(test_set.exe tests/test_set.cpp)
+AddMaelstromTest(test_select.exe tests/test_select.cpp)

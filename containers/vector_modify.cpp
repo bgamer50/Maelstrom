@@ -1,14 +1,15 @@
 #include "containers/vector.h"
+#include <iostream>
 
 namespace maelstrom {
     
     void vector::clear() {
         if(this->view) throw std::runtime_error("Cannot clear a view!");
 
-            this->dealloc(this->data_ptr);
-            this->filled_size = 0;
-            this->reserved_size = 0;
-            this->data_ptr = nullptr;
+        this->dealloc(this->data_ptr);
+        this->filled_size = 0;
+        this->reserved_size = 0;
+        this->data_ptr = nullptr;
     }
 
     void vector::push_back() {
@@ -31,8 +32,10 @@ namespace maelstrom {
 
     void vector::insert(size_t ix_start, vector& new_elements) {
         if(this->view) throw std::runtime_error("Cannot insert into a view!");
-        if(this->dtype.prim_type != new_elements.dtype.prim_type) throw std::runtime_error("Data type of inserting vector must match!");
         if(this->data_ptr == new_elements.data_ptr) throw std::runtime_error("Inserted vector cannot be same vector!");
+
+        if(this->dtype.prim_type != new_elements.dtype.prim_type) throw std::runtime_error("Data type of inserting vector must match!");
+        
 
         size_t old_size = this->size();
         size_t new_size = old_size + new_elements.size();
@@ -98,13 +101,20 @@ namespace maelstrom {
         this->reserved_size = N;
     }
 
-    vector vector::to(maelstrom::storage mem_type) {
+    vector vector::to(maelstrom::storage new_mem_type) {
         auto new_vec = vector(
-            mem_type,
+            new_mem_type,
             this->get_dtype()
         );
 
-        new_vec.insert(0, *this);
+        auto this_view = maelstrom::vector(
+            this->mem_type,
+            this->dtype,
+            this->data_ptr,
+            this->filled_size,
+            true
+        );
+        new_vec.insert(0, this_view);
         return new_vec;
     }
 
