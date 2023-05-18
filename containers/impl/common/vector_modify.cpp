@@ -26,19 +26,17 @@ namespace maelstrom {
         this->filled_size = old_filled_size;
     }
 
-    void vector::insert() {
-        throw std::runtime_error("insert unimplemented");
-    }
-
-    void vector::insert(size_t ix_start, vector& new_elements) {
+    void vector::insert(size_t ix_start, vector& new_elements, size_t add_ix_start, size_t add_ix_end) {
         if(this->view) throw std::runtime_error("Cannot insert into a view!");
         if(this->data_ptr == new_elements.data_ptr) throw std::runtime_error("Inserted vector cannot be same vector!");
 
         if(this->dtype.prim_type != new_elements.dtype.prim_type) throw std::runtime_error("Data type of inserting vector must match!");
-        
 
+        if(add_ix_end < add_ix_start) throw std::runtime_error("Invalid range in new elements");
+        
+        size_t insert_size = add_ix_end - add_ix_start;
         size_t old_size = this->size();
-        size_t new_size = old_size + new_elements.size();
+        size_t new_size = old_size + insert_size;
         
         void* new_data = this->data_ptr;
         if(new_size > reserved_size) {
@@ -52,15 +50,15 @@ namespace maelstrom {
         if(elements_to_copy > 0) {
             this->copy(
                 static_cast<char*>(this->data_ptr) + (element_size * ix_start),
-                static_cast<char*>(new_data) + (element_size * (ix_start + new_elements.size())),
+                static_cast<char*>(new_data) + (element_size * (ix_start + insert_size)),
                 elements_to_copy
             );
         }
 
         this->copy(
-            new_elements.data(),
-            static_cast<char*>(new_data) + (element_size * ix_start),
-            new_elements.size()
+            static_cast<unsigned char*>(new_elements.data()) + element_size * add_ix_start,
+            static_cast<unsigned char*>(new_data) + (element_size * ix_start),
+            insert_size
         );
 
         if(this->data_ptr != new_data) {

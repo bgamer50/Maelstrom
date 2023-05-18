@@ -37,6 +37,27 @@ namespace maelstrom {
         if(t == typeid(float)) return primitive_t::FLOAT32;
     }
 
+    dtype_t dtype_from_prim_type(primitive_t prim_type) {
+        switch(prim_type) {
+            case UINT64:
+               return uint64;
+            case UINT32:
+                return uint32;
+            case UINT8:
+                return uint8;
+            case INT64:
+                return int64;
+            case INT32:
+                return int32;
+            case INT8:
+                return int8;
+            case FLOAT64:
+                return float64;
+            case FLOAT32:
+                return float32;
+        }
+    }
+
     std::pair<std::vector<unsigned char>, primitive_t> any_to_bytes(boost::any& a) {
         primitive_t prim_type = prim_type_of(a);
         std::vector<unsigned char> bytes(size_of(prim_type));
@@ -137,4 +158,6 @@ namespace maelstrom {
         primitive_t::FLOAT32,
         [](void* v){ return boost::any(*static_cast<float*>(v)); }
     };
+
+    dtype_t default_dtype = float64;
 }

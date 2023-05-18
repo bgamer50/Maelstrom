@@ -20,17 +20,18 @@ add_library(
     maelstrom
 
     # cpp
-    containers/vector_construct.cpp
-    containers/vector_modify.cpp
+    containers/impl/common/vector_construct.cpp
+    containers/impl/common/vector_modify.cpp
     storage/datatype.cpp
+    algorithms/impl/common/unpack.cpp
 
     # cuda
-    containers/vector_malloc.cu
-    containers/vector_access.cu
-    algorithms/remove_if.cu
-    algorithms/increment.cu
-    algorithms/select.cu
-    algorithms/set.cu
+    containers/impl/thrust/vector_malloc.cu
+    containers/impl/thrust/vector_access.cu
+    algorithms/impl/thrust/remove_if.cu
+    algorithms/impl/thrust/increment.cu
+    algorithms/impl/thrust/select.cu
+    algorithms/impl/thrust/set.cu
 )
 
 target_compile_options(
@@ -78,3 +79,4 @@ AddMaelstromTest(test_remove.exe tests/test_remove.cpp)
 AddMaelstromTest(test_increment.exe tests/test_increment.cpp)
 AddMaelstromTest(test_set.exe tests/test_set.cpp)
 AddMaelstromTest(test_select.exe tests/test_select.cpp)
+AddMaelstromTest(test_unpack.exe tests/test_unpack.cpp)

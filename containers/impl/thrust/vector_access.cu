@@ -6,6 +6,8 @@
 namespace maelstrom {
 
     boost::any vector::get(size_t i) {
+        if(i >= this->filled_size) throw std::runtime_error("Attempted to get element out of bounds!");
+
         size_t data_size = maelstrom::size_of(this->dtype);
         std::vector<unsigned char> raw_value(data_size);
         void* ptr = raw_value.data();
@@ -38,6 +40,16 @@ namespace maelstrom {
         }
 
         return vec.to(maelstrom::storage::DEVICE);
+    }
+
+    maelstrom::vector as_primitive_vector(maelstrom::vector& vec, bool view) {
+        return maelstrom::vector(
+            vec.get_mem_type(),
+            maelstrom::dtype_from_prim_type(vec.get_dtype().prim_type),
+            vec.data(),
+            vec.size(),
+            view
+        );
     }
 
 }

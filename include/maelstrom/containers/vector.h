@@ -59,9 +59,18 @@ namespace maelstrom {
 
             void reserve(size_t N);
 
-            void insert(); // single insert, range insert
+            /*
+                At position ix_start in this vector, adds the elements in the given vector
+                in the range [add_ix_start, add_ix_end).
+            */
+            void insert(size_t ix_start, vector& new_elements, size_t add_ix_start, size_t add_ix_end);
 
-            void insert(size_t ix_start, vector& new_elements);
+            /*
+                At position ix_start in this vector, add all elements in the given vector.
+            */
+            inline void insert(size_t ix_start, vector& new_elements) {
+                return this->insert(ix_start, new_elements, 0, new_elements.size());
+            }
 
             inline void erase(){} // single erase, range erase
             
@@ -132,6 +141,11 @@ namespace maelstrom {
     maelstrom::vector as_device_vector(maelstrom::vector& vec);
 
     /*
+        Returns a view if view=true, or a copy if view=false, of the current vector with the corresponding primitive type of the vector
+    */
+    maelstrom::vector as_primitive_vector(maelstrom::vector& vec, bool view=true);
+
+    /*
         Makes a new vector with the same memory type and data type as the given vector.
         
     */
@@ -141,5 +155,17 @@ namespace maelstrom {
             vec.get_dtype()
         );
    }
+
+   /*
+        Makes a new vector of appropriate data type from the given vector of anys
+        with the given storage type.
+   */
+   inline maelstrom::vector make_vector_from_anys(maelstrom::storage mem_type, std::vector<boost::any>& anys);
+
+   /*
+        Makes a new vector of the given data type from the given vector of anys
+        with the given storage type.
+   */
+   inline maelstrom::vector make_vector_from_anys(maelstrom::storage mem_type, maelstrom::dtype_t dtype, std::vector<boost::any>& anys);
 
 }

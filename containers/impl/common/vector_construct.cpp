@@ -1,5 +1,6 @@
 #include "containers/vector.h"
 #include "storage/datatype.h"
+#include <sstream>
 
 namespace maelstrom {
 
@@ -13,9 +14,9 @@ namespace maelstrom {
         this->view = false;
     }
 
-    // Default constructor; creates a blank device vector of FLOAT64 dtype
+    // Default constructor; creates a blank device vector of default dtype
     vector::vector()
-    : vector(maelstrom::storage::DEVICE, maelstrom::float64) {}
+    : vector(maelstrom::storage::DEVICE, maelstrom::default_dtype) {}
 
     // Creates a vector of size N unitialized values of the given data type and given memory type.
     vector::vector(maelstrom::storage mem_type, maelstrom::dtype_t dtype, size_t N) {
@@ -122,6 +123,48 @@ namespace maelstrom {
         other.view = true;
 
         return *this;
+    }
+
+    vector make_vector_from_anys(maelstrom::storage mem_type, maelstrom::dtype_t dtype, std::vector<boost::any>& anys) {
+        if(anys.empty()) return maelstrom::vector(mem_type, maelstrom::default_dtype);
+
+        std::vector<unsigned char> bytes;
+        bytes.reserve(anys.size() * maelstrom::size_of(dtype));
+        for(size_t k = 0; k < anys.size(); ++k) {
+            std::vector<unsigned char> bytes_k;
+            maelstrom::primitive_t prim_k;
+            std::tie(bytes, prim_k) = maelstrom::any_to_bytes(anys[k]);
+            
+            if(prim_k != dtype.prim_type) {
+                std::stringstream sx;
+                sx << "Type mismatch in array at index " << k;
+                throw std::runtime_error(sx.str());
+            }
+
+            bytes.insert(bytes.end(), bytes_k.begin(), bytes_k.end());
+            
+        }
+
+        return maelstrom::vector(
+            mem_type,
+            dtype,
+            bytes.data(),
+            anys.size(),
+            false
+        );
+    }
+
+    vector make_vector_from_anys(maelstrom::storage mem_type, std::vector<boost::any>& anys) {
+        if(anys.empty()) return maelstrom::vector(mem_type, maelstrom::default_dtype);
+        maelstrom::dtype_t dtype = maelstrom::dtype_from_prim_type(
+            maelstrom::prim_type_of(anys.front())
+        );
+
+        return make_vector_from_anys(
+            mem_type,
+            dtype,
+            anys
+        );
     }
 
 }

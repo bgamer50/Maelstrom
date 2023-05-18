@@ -23,6 +23,8 @@ namespace maelstrom {
 
     primitive_t prim_type_of(boost::any& a);
 
+    dtype_t dtype_from_prim_type(primitive_t prim_type);
+
     std::pair<std::vector<unsigned char>, primitive_t> any_to_bytes(boost::any& a);
 
     extern dtype_t uint64;
@@ -33,4 +35,6 @@ namespace maelstrom {
     extern dtype_t int8;
     extern dtype_t float64;
     extern dtype_t float32;
+
+    extern dtype_t default_dtype;
 }
