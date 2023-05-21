@@ -31,6 +31,7 @@
 #include <limits>
 
 #include "thrust_utils/execution.cuh"
+#include "storage/comparison.h"
 
 namespace maelstrom {
 
@@ -68,5 +69,30 @@ namespace maelstrom {
             static_cast<T*>(v)
         );
     }
+
+    template <typename T>
+    struct filter_fn {
+        T filter_val;
+        maelstrom::comparator cmp;
+
+        __host__ __device__ bool operator() (const T val) {
+            switch(cmp) {
+                case EQUALS:
+                    return val == filter_val;
+                case LESS_THAN:
+                    return val < filter_val;
+                case GREATER_THAN:
+                    return val > filter_val;
+                case LESS_THAN_OR_EQUAL:
+                    return val <= filter_val;
+                case GREATER_THAN_OR_EQUAL:
+                    return val >= filter_val;
+                case NOT_EQUALS:
+                    return val != filter_val;
+            }
+
+            return false;
+        }
+    };
     
 }

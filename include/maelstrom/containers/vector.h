@@ -120,6 +120,8 @@ namespace maelstrom {
 
             void resize(size_t N);
 
+            void shrink_to_fit();
+
             /*
                 Creates a copy of this vector with the given memory type.
             */

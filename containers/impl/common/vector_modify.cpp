@@ -99,6 +99,22 @@ namespace maelstrom {
         this->reserved_size = N;
     }
 
+    void vector::shrink_to_fit() {
+        if(this->view) throw std::runtime_error("Cannot shrink a view!");
+        if(this->empty() || this->filled_size == this->reserved_size) return;
+
+        void* new_data = this->alloc(this->filled_size);
+        this->copy(
+            this->data_ptr,
+            new_data,
+            this->filled_size
+        );
+
+        this->dealloc(this->data_ptr);
+        this->data_ptr = new_data;
+        this->reserved_size = this->filled_size;
+    }
+
     vector vector::to(maelstrom::storage new_mem_type) {
         auto new_vec = vector(
             new_mem_type,

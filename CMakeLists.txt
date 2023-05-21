@@ -32,6 +32,7 @@ add_library(
     algorithms/impl/thrust/increment.cu
     algorithms/impl/thrust/select.cu
     algorithms/impl/thrust/set.cu
+    algorithms/impl/thrust/filter.cu
 )
 
 target_compile_options(
@@ -80,3 +81,4 @@ AddMaelstromTest(test_increment.exe tests/test_increment.cpp)
 AddMaelstromTest(test_set.exe tests/test_set.cpp)
 AddMaelstromTest(test_select.exe tests/test_select.cpp)
 AddMaelstromTest(test_unpack.exe tests/test_unpack.cpp)
+AddMaelstromTest(test_filter.exe tests/test_filter.cpp)

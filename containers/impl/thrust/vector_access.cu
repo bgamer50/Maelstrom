@@ -6,7 +6,7 @@
 namespace maelstrom {
 
     boost::any vector::get(size_t i) {
-        if(i >= this->filled_size) throw std::runtime_error("Attempted to get element out of bounds!");
+        if(i >= this->filled_size) throw std::out_of_range("Attempted to get element out of bounds!");
 
         size_t data_size = maelstrom::size_of(this->dtype);
         std::vector<unsigned char> raw_value(data_size);
