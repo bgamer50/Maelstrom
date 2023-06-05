@@ -33,6 +33,10 @@ add_library(
     algorithms/impl/thrust/select.cu
     algorithms/impl/thrust/set.cu
     algorithms/impl/thrust/filter.cu
+    algorithms/impl/thrust/compare.cu
+    algorithms/impl/thrust/sort.cu
+    algorithms/impl/thrust/unique.cu
+    algorithms/impl/thrust/count_unique.cu
 )
 
 target_compile_options(
@@ -82,3 +86,7 @@ AddMaelstromTest(test_set.exe tests/test_set.cpp)
 AddMaelstromTest(test_select.exe tests/test_select.cpp)
 AddMaelstromTest(test_unpack.exe tests/test_unpack.cpp)
 AddMaelstromTest(test_filter.exe tests/test_filter.cpp)
+AddMaelstromTest(test_compare.exe tests/test_compare.cpp)
+AddMaelstromtest(test_sort.exe tests/test_sort.cpp)
+AddMaelstromTest(test_unique.exe tests/test_unique.cpp)
+AddMaelstromTest(test_count_unique.exe tests/test_count_unique.cpp)

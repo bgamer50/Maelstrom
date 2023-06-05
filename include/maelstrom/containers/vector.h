@@ -53,6 +53,8 @@ namespace maelstrom {
             
             vector& operator=(vector&& other) noexcept;
 
+            vector& operator=(vector& other) noexcept;
+
             inline bool is_view() { return this->view; }
 
             void push_back();

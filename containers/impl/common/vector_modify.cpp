@@ -5,6 +5,7 @@ namespace maelstrom {
     
     void vector::clear() {
         if(this->view) throw std::runtime_error("Cannot clear a view!");
+        if(this->reserved_size == 0 || this->data_ptr == nullptr) return;
 
         this->dealloc(this->data_ptr);
         this->filled_size = 0;

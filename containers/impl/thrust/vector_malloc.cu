@@ -69,13 +69,17 @@ namespace maelstrom {
             case DEVICE: {
                 cudaFree(ptr);
                 cudaDeviceSynchronize();
-                maelstrom::cuda::cudaCheckErrors("vector dealloc device memory");
+                std::stringstream sx;
+                sx << "vector dealloc device memory (" << this->name << ")";
+                maelstrom::cuda::cudaCheckErrors(sx.str());
                 return;
             }
             case PINNED: {
                 cudaFreeHost(ptr);
                 cudaDeviceSynchronize();
-                maelstrom::cuda::cudaCheckErrors("vector dealloc pinned memory");
+                std::stringstream sx;
+                sx << "vector dealloc pinned memory (" << this->name << ")";
+                maelstrom::cuda::cudaCheckErrors(sx.str());
                 return;
             }
         }

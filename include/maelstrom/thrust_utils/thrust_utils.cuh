@@ -94,5 +94,37 @@ namespace maelstrom {
             return false;
         }
     };
+
+    template <typename T>
+    struct compare_fn {
+        maelstrom::comparator cmp;
+        bool invert;
+
+        __host__ __device__ bool operator() (const T left, const T right) {
+            bool z;
+            switch(cmp) {
+                case EQUALS:
+                    z = (left == right);
+                    break;
+                case LESS_THAN:
+                    z = (left < right);
+                    break;
+                case GREATER_THAN:
+                    z = (left > right);
+                    break;
+                case LESS_THAN_OR_EQUAL:
+                    z = (left <= right);
+                    break;
+                case GREATER_THAN_OR_EQUAL:
+                    z = (left >= right);
+                    break;
+                case NOT_EQUALS:
+                    z = (left != right);
+                    break;
+            }
+
+            return invert ? (!z) : (z);
+        }
+    };
     
 }

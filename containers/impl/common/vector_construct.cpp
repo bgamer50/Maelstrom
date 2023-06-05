@@ -1,6 +1,7 @@
 #include "containers/vector.h"
 #include "storage/datatype.h"
 #include <sstream>
+#include <iostream>
 
 namespace maelstrom {
 
@@ -73,19 +74,9 @@ namespace maelstrom {
         this->copy(orig.data_ptr, this->data_ptr, orig.filled_size);                    
     }
 
-    vector::~vector() {
-        if(this->data_ptr != nullptr && !this->view) {
-            this->dealloc(this->data_ptr);
-        }
-    }
-
     vector::vector(vector&& other) noexcept {
         if(&other == this) {
             return;
-        }
-
-        if(!this->view && this->reserved_size > 0) {
-            this->clear();
         }
 
         this->data_ptr = other.data_ptr;
@@ -99,6 +90,12 @@ namespace maelstrom {
         other.filled_size = 0;
         other.reserved_size = 0;
         other.view = true;
+    }
+
+    vector::~vector() {
+        if(this->data_ptr != nullptr && !this->view) {
+            this->dealloc(this->data_ptr);
+        }
     }
     
     vector& vector::operator=(vector&& other) noexcept {
@@ -121,6 +118,24 @@ namespace maelstrom {
         other.filled_size = 0;
         other.reserved_size = 0;
         other.view = true;
+
+        return *this;
+    }
+
+    vector& vector::operator=(vector& other) noexcept {
+        if(&other == this) {
+            return *this;
+        }
+
+        this->dealloc(this->data_ptr);
+        this->mem_type = other.mem_type;
+        this->dtype = other.dtype;
+        this->view = other.view;
+
+        this->data_ptr = this->alloc(other.reserved_size);
+        this->filled_size = other.filled_size;
+        this->reserved_size = other.reserved_size;
+        this->copy(other.data_ptr, this->data_ptr, this->reserved_size);
 
         return *this;
     }
