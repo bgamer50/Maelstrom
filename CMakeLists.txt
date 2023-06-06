@@ -37,6 +37,7 @@ add_library(
     algorithms/impl/thrust/sort.cu
     algorithms/impl/thrust/unique.cu
     algorithms/impl/thrust/count_unique.cu
+    algorithms/impl/thrust/reduce.cu
 )
 
 target_compile_options(
@@ -90,3 +91,4 @@ AddMaelstromTest(test_compare.exe tests/test_compare.cpp)
 AddMaelstromtest(test_sort.exe tests/test_sort.cpp)
 AddMaelstromTest(test_unique.exe tests/test_unique.cpp)
 AddMaelstromTest(test_count_unique.exe tests/test_count_unique.cpp)
+AddMaelstromTest(test_reduce.exe tests/test_reduce.cpp)

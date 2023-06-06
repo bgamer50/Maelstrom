@@ -14,7 +14,9 @@ namespace maelstrom {
 
     /*
         Reduces the vector using the given reductor.
-        Returns the reduced value as an any.
+        Returns the reduced value and its originating index
+        as an any of the input datatype, except
+        for the mean reduction, which always returns a double.
     */
-    boost::any reduce(maelstrom::vector& vec, maelstrom::reductor red);
+    std::pair<boost::any, size_t> reduce(maelstrom::vector& vec, maelstrom::reductor red);
 }
