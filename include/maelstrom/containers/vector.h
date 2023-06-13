@@ -125,6 +125,31 @@ namespace maelstrom {
             void shrink_to_fit();
 
             /*
+                Elementwise sum of two vectors
+            */
+            vector operator+(vector& other);
+
+            /*
+                Elementwise subtraction of two vectors
+            */
+            vector operator-(vector& other);
+
+            /*
+                Elementwise product of two vectors
+            */
+            vector operator*(vector& other);
+
+            /*
+                Elementwise division of two vectors
+            */
+            vector operator/(vector& other);
+
+            /*
+                Creates a copy of this vector with all elements transformed to the given dtype.
+            */
+            vector astype(maelstrom::dtype_t new_type);
+
+            /*
                 Creates a copy of this vector with the given memory type.
             */
             vector to(maelstrom::storage mem_type);

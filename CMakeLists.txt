@@ -22,6 +22,7 @@ add_library(
     # cpp
     containers/impl/common/vector_construct.cpp
     containers/impl/common/vector_modify.cpp
+    containers/impl/common/vector_math.cpp
     storage/datatype.cpp
     algorithms/impl/common/unpack.cpp
 
@@ -38,6 +39,10 @@ add_library(
     algorithms/impl/thrust/unique.cu
     algorithms/impl/thrust/count_unique.cu
     algorithms/impl/thrust/reduce.cu
+    algorithms/impl/thrust/reduce_by_key.cu
+    algorithms/impl/thrust/math.cu
+    algorithms/impl/thrust/cast.cu
+    algorithms/impl/thrust/arange.cu
 )
 
 target_compile_options(
@@ -92,3 +97,7 @@ AddMaelstromtest(test_sort.exe tests/test_sort.cpp)
 AddMaelstromTest(test_unique.exe tests/test_unique.cpp)
 AddMaelstromTest(test_count_unique.exe tests/test_count_unique.cpp)
 AddMaelstromTest(test_reduce.exe tests/test_reduce.cpp)
+AddMaelstromTest(test_reduce_by_key.exe tests/test_reduce_by_key.cpp)
+AddMaelstromTest(test_math.exe tests/test_math.cpp)
+AddMaelstromTest(test_cast.exe tests/test_cast.cpp)
+AddMaelstromTest(test_arange.exe tests/test_arange.cpp)

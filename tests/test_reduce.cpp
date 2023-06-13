@@ -58,8 +58,6 @@ void test_reduce_ix() {
     assert( boost::any_cast<double>(val) == -3.3 );
     assert( ix ==  7);
     
-    boost::any val;
-    size_t ix;
     std::tie(val, ix) = maelstrom::reduce(m_array, maelstrom::reductor::MAX);
 
     assert( boost::any_cast<double>(val) == 9.4 );

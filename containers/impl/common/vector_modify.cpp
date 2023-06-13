@@ -1,4 +1,5 @@
 #include "containers/vector.h"
+#include "algorithms/cast.h"
 #include <iostream>
 
 namespace maelstrom {
@@ -114,6 +115,10 @@ namespace maelstrom {
         this->dealloc(this->data_ptr);
         this->data_ptr = new_data;
         this->reserved_size = this->filled_size;
+    }
+
+    vector vector::astype(maelstrom::dtype_t new_dtype) {
+        return maelstrom::cast(*this, new_dtype);
     }
 
     vector vector::to(maelstrom::storage new_mem_type) {

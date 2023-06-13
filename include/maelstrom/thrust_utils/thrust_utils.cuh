@@ -44,6 +44,15 @@ namespace maelstrom {
         }
     };
 
+    template <typename T>
+    struct unary_times_op : public thrust::unary_function<T, T> {
+        T times_val;
+        
+        __device__ __host__ T operator()(T in) const {
+            return in * times_val;
+        }
+    };
+
     struct plus_op : public thrust::unary_function<thrust::tuple<size_t,size_t>,size_t> {
         __device__ size_t operator()(thrust::tuple<size_t, size_t> t) const {
             return thrust::get<0>(t) + thrust::get<1>(t);
@@ -69,6 +78,13 @@ namespace maelstrom {
             static_cast<T*>(v)
         );
     }
+
+    template <typename I, typename O>
+    struct cast_fn {
+        __host__ __device__ O operator() (const I val) {
+            return static_cast<O>(val);
+        }
+    };
 
     template <typename T>
     struct filter_fn {
@@ -178,5 +194,33 @@ namespace maelstrom {
             );
         }
     };
-    
+
+
+    template <typename T>
+    struct math_binary_plus : public thrust::unary_function<thrust::tuple<T, T>, T> {
+        __device__ __host__ T operator()(const thrust::tuple<T, T> input) {
+            return thrust::get<0>(input) + thrust::get<1>(input);
+        }
+    };
+
+    template <typename T>
+    struct math_binary_minus : public thrust::unary_function<thrust::tuple<T, T>, T> {
+        __device__ __host__ T operator()(const thrust::tuple<T, T> input) {
+            return thrust::get<0>(input) - thrust::get<1>(input);
+        }
+    };
+
+    template <typename T>
+    struct math_binary_times : public thrust::unary_function<thrust::tuple<T, T>, T> {
+        __device__ __host__ T operator()(const thrust::tuple<T, T> input) {
+            return thrust::get<0>(input) * thrust::get<1>(input);
+        }
+    };
+
+    template <typename T>
+    struct math_binary_divide : public thrust::unary_function<thrust::tuple<T, T>, T> {
+        __device__ __host__ T operator()(const thrust::tuple<T, T> input) {
+            return thrust::get<0>(input) / thrust::get<1>(input);
+        }
+    };
 }

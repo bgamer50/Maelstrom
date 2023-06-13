@@ -2,16 +2,17 @@
 
 #include <tuple>
 
-#include "maelstrom/containers/vector.h"
-#include "maelstrom/algorithms/unique.h"
-#include "maelstrom/algorithms/reduce.h"
+#include "containers/vector.h"
+#include "algorithms/unique.h"
+#include "algorithms/reduce.h"
 
 namespace maelstrom {
 
     /*
         For each key, groups and reduces the values present in the vector, returning
         a reduced result for each key, as well as the global originating index.
-        The keys and originating indices end up in their own vectors, obviously.
+        The reductions and originating indices end up in their own vectors, obviously,
+        of the form <red_values, indices>
 
         max_unique_keys is the largest possible number of unique keys and is required
         to properly allocate memory.
@@ -25,7 +26,8 @@ namespace maelstrom {
     /*
         For each key, groups and reduces the values present in the vector, returning
         a reduced result for each key, as well as the global originating index.
-        The keys and originating indices end up in their own vectors, obviously.
+        The keys and originating indices end up in their own vectors, obviously,
+        of the form <red_values, indices>
 
         Automatically calculates the size of the returned array based on the number of
         unique keys, which may be inefficient.
