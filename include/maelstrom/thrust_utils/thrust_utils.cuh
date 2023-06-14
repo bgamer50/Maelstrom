@@ -10,8 +10,10 @@
 #include <thrust/copy.h>
 #include <thrust/scan.h>
 #include <thrust/transform_scan.h>
-#include <thrust/adjacent_difference.h>
 #include <thrust/gather.h>
+
+#include <thrust/adjacent_difference.h>
+#include <thrust/set_operations.h>
 
 #include <thrust/device_ptr.h>
 #include <thrust/device_vector.h>

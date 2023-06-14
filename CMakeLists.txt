@@ -43,6 +43,7 @@ add_library(
     algorithms/impl/thrust/math.cu
     algorithms/impl/thrust/cast.cu
     algorithms/impl/thrust/arange.cu
+    algorithms/impl/thrust/intersection.cu
 )
 
 target_compile_options(
@@ -101,3 +102,4 @@ AddMaelstromTest(test_reduce_by_key.exe tests/test_reduce_by_key.cpp)
 AddMaelstromTest(test_math.exe tests/test_math.cpp)
 AddMaelstromTest(test_cast.exe tests/test_cast.cpp)
 AddMaelstromTest(test_arange.exe tests/test_arange.cpp)
+AddMaelstromTest(test_intersection.exe tests/test_intersection.cpp)
