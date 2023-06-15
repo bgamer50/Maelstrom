@@ -1,5 +1,5 @@
-#include "containers/vector.h"
-#include "algorithms/cast.h"
+#include "maelstrom/containers/vector.h"
+#include "maelstrom/algorithms/cast.h"
 #include <iostream>
 
 namespace maelstrom {

@@ -59,7 +59,7 @@ target_compile_options(
 target_include_directories(
     maelstrom
     PUBLIC
-        "/mnt/maelstrom/include/maelstrom" # maelstrom path
+        "/mnt/maelstrom/include" # maelstrom path
 )
 
 function(AddMaelstromTest EXEC_NAME)

@@ -1,5 +1,5 @@
-#include "algorithms/sort.h"
-#include "thrust_utils/thrust_utils.cuh"
+#include "maelstrom/algorithms/sort.h"
+#include "maelstrom/thrust_utils/thrust_utils.cuh"
 
 namespace maelstrom {
 

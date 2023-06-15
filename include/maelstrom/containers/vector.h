@@ -4,8 +4,8 @@
 #include <inttypes.h>
 #include <string>
 
-#include "storage/storage.h"
-#include "storage/datatype.h"
+#include "maelstrom/storage/storage.h"
+#include "maelstrom/storage/datatype.h"
 
 namespace maelstrom {
 

@@ -1,7 +1,7 @@
-#include "algorithms/unique.h"
-#include "algorithms/select.h"
-#include "algorithms/sort.h"
-#include "thrust_utils/thrust_utils.cuh"
+#include "maelstrom/algorithms/unique.h"
+#include "maelstrom/algorithms/select.h"
+#include "maelstrom/algorithms/sort.h"
+#include "maelstrom/thrust_utils/thrust_utils.cuh"
 #include <boost/any.hpp>
 
 namespace maelstrom {

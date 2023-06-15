@@ -1,6 +1,6 @@
-#include "algorithms/remove_if.h"
-#include "thrust_utils/thrust_utils.cuh"
-#include "thrust_utils/execution.cuh"
+#include "maelstrom/algorithms/remove_if.h"
+#include "maelstrom/thrust_utils/thrust_utils.cuh"
+#include "maelstrom/thrust_utils/execution.cuh"
 
 #include <boost/any.hpp>
 #include <sstream>

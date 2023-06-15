@@ -1,7 +1,7 @@
-#include "algorithms/increment.h"
+#include "maelstrom/algorithms/increment.h"
 
-#include "thrust_utils/thrust_utils.cuh"
-#include "thrust_utils/execution.cuh"
+#include "maelstrom/thrust_utils/thrust_utils.cuh"
+#include "maelstrom/thrust_utils/execution.cuh"
 
 namespace maelstrom {
 

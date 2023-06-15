@@ -1,7 +1,7 @@
-#include "algorithms/count_unique.h"
-#include "algorithms/sort.h"
+#include "maelstrom/algorithms/count_unique.h"
+#include "maelstrom/algorithms/sort.h"
 
-#include "thrust_utils/thrust_utils.cuh"
+#include "maelstrom/thrust_utils/thrust_utils.cuh"
 
 namespace maelstrom {
 

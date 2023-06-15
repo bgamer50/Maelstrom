@@ -1,6 +1,6 @@
-#include "algorithms/arange.h"
-#include "thrust_utils/thrust_utils.cuh"
-#include "thrust_utils/execution.cuh"
+#include "maelstrom/algorithms/arange.h"
+#include "maelstrom/thrust_utils/thrust_utils.cuh"
+#include "maelstrom/thrust_utils/execution.cuh"
 
 namespace maelstrom {
 

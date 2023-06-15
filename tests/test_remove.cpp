@@ -1,5 +1,5 @@
-#include "containers/vector.h"
-#include "algorithms/remove_if.h"
+#include "maelstrom/containers/vector.h"
+#include "maelstrom/algorithms/remove_if.h"
 #include "test_utils.hpp"
 
 #include <vector>

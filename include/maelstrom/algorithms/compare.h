@@ -1,8 +1,8 @@
 #pragma once
 
-#include "storage/comparison.h"
-#include "containers/vector.h"
-#include "algorithms/remove_if.h"
+#include "maelstrom/storage/comparison.h"
+#include "maelstrom/containers/vector.h"
+#include "maelstrom/algorithms/remove_if.h"
 
 namespace maelstrom {
 

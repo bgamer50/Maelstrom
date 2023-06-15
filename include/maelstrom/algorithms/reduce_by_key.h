@@ -2,9 +2,9 @@
 
 #include <tuple>
 
-#include "containers/vector.h"
-#include "algorithms/unique.h"
-#include "algorithms/reduce.h"
+#include "maelstrom/containers/vector.h"
+#include "maelstrom/algorithms/unique.h"
+#include "maelstrom/algorithms/reduce.h"
 
 namespace maelstrom {
 

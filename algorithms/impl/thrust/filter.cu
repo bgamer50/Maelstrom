@@ -1,5 +1,5 @@
-#include "algorithms/filter.h"
-#include "thrust_utils/thrust_utils.cuh"
+#include "maelstrom/algorithms/filter.h"
+#include "maelstrom/thrust_utils/thrust_utils.cuh"
 
 #include <sstream>
 

@@ -32,8 +32,8 @@
 
 #include <limits>
 
-#include "thrust_utils/execution.cuh"
-#include "storage/comparison.h"
+#include "maelstrom/thrust_utils/execution.cuh"
+#include "maelstrom/storage/comparison.h"
 
 namespace maelstrom {
 

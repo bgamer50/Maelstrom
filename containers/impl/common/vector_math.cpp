@@ -1,5 +1,5 @@
-#include "containers/vector.h"
-#include "algorithms/math.h"
+#include "maelstrom/containers/vector.h"
+#include "maelstrom/algorithms/math.h"
 
 namespace maelstrom {
     vector vector::operator+(vector& other) {

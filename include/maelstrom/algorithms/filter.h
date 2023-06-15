@@ -1,7 +1,7 @@
 #pragma once
 
-#include "storage/comparison.h"
-#include "containers/vector.h"
+#include "maelstrom/storage/comparison.h"
+#include "maelstrom/containers/vector.h"
 
 namespace maelstrom {
     /*

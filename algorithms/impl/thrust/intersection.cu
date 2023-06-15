@@ -1,9 +1,9 @@
-#include "algorithms/intersection.h"
-#include "algorithms/sort.h"
-#include "algorithms/select.h"
+#include "maelstrom/algorithms/intersection.h"
+#include "maelstrom/algorithms/sort.h"
+#include "maelstrom/algorithms/select.h"
 
-#include "thrust_utils/thrust_utils.cuh"
-#include "thrust_utils/execution.cuh"
+#include "maelstrom/thrust_utils/thrust_utils.cuh"
+#include "maelstrom/thrust_utils/execution.cuh"
 
 namespace maelstrom {
 

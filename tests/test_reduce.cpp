@@ -1,5 +1,5 @@
-#include "containers/vector.h"
-#include "algorithms/reduce.h"
+#include "maelstrom/containers/vector.h"
+#include "maelstrom/algorithms/reduce.h"
 #include "test_utils.hpp"
 
 #include <vector>

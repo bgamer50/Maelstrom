@@ -1,5 +1,5 @@
-#include "containers/vector.h"
-#include "algorithms/intersection.h"
+#include "maelstrom/containers/vector.h"
+#include "maelstrom/algorithms/intersection.h"
 #include "test_utils.hpp"
 
 #include <vector>

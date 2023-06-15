@@ -1,7 +1,7 @@
 #pragma once
 
-#include "containers/vector.h"
-#include "algorithms/unique.h"
+#include "maelstrom/containers/vector.h"
+#include "maelstrom/algorithms/unique.h"
 #include <tuple>
 
 namespace maelstrom {

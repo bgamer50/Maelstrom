@@ -1,7 +1,7 @@
-#include "containers/vector.h"
-#include "algorithms/sort.h"
-#include "algorithms/unique.h"
-#include "algorithms/select.h"
+#include "maelstrom/containers/vector.h"
+#include "maelstrom/algorithms/sort.h"
+#include "maelstrom/algorithms/unique.h"
+#include "maelstrom/algorithms/select.h"
 #include "test_utils.hpp"
 
 #include <vector>

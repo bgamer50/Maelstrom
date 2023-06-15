@@ -1,4 +1,4 @@
-#include "storage/datatype.h"
+#include "maelstrom/storage/datatype.h"
 
 namespace maelstrom {
 
@@ -35,6 +35,8 @@ namespace maelstrom {
         if(t == typeid(int8_t)) return primitive_t::INT8;
         if(t == typeid(double)) return primitive_t::FLOAT64;
         if(t == typeid(float)) return primitive_t::FLOAT32;
+
+        throw std::runtime_error("Unknown type");
     }
 
     dtype_t dtype_from_prim_type(primitive_t prim_type) {
@@ -56,6 +58,8 @@ namespace maelstrom {
             case FLOAT32:
                 return float32;
         }
+
+        throw std::runtime_error("Invalid primitive type");
     }
 
     std::pair<std::vector<unsigned char>, primitive_t> any_to_bytes(boost::any& a) {

@@ -1,4 +1,4 @@
-#include "containers/vector.h"
+#include "maelstrom/containers/vector.h"
 
 #include <vector>
 #include <cuda_runtime.h>

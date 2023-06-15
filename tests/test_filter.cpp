@@ -1,5 +1,5 @@
-#include "containers/vector.h"
-#include "algorithms/filter.h"
+#include "maelstrom/containers/vector.h"
+#include "maelstrom/algorithms/filter.h"
 #include "test_utils.hpp"
 
 #include <vector>

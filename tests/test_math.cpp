@@ -1,6 +1,6 @@
-#include "containers/vector.h"
-#include "algorithms/math.h"
-#include "algorithms/set.h"
+#include "maelstrom/containers/vector.h"
+#include "maelstrom/algorithms/math.h"
+#include "maelstrom/algorithms/set.h"
 #include "test_utils.hpp"
 
 #include <vector>

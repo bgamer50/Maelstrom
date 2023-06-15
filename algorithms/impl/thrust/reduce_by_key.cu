@@ -1,10 +1,10 @@
-#include "algorithms/reduce_by_key.h"
-#include "algorithms/sort.h"
-#include "algorithms/select.h"
-#include "algorithms/count_unique.h"
+#include "maelstrom/algorithms/reduce_by_key.h"
+#include "maelstrom/algorithms/sort.h"
+#include "maelstrom/algorithms/select.h"
+#include "maelstrom/algorithms/count_unique.h"
 
-#include "thrust_utils/execution.cuh"
-#include "thrust_utils/thrust_utils.cuh"
+#include "maelstrom/thrust_utils/execution.cuh"
+#include "maelstrom/thrust_utils/thrust_utils.cuh"
 
 namespace maelstrom {
 

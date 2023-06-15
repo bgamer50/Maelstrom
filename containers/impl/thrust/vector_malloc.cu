@@ -1,5 +1,5 @@
-#include "containers/vector.h"
-#include "util/cuda_utils.cuh"
+#include "maelstrom/containers/vector.h"
+#include "maelstrom/util/cuda_utils.cuh"
 
 #include <cuda_runtime.h>
 
