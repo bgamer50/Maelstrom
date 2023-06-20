@@ -25,8 +25,9 @@ add_library(
     containers/impl/common/vector_math.cpp
     storage/datatype.cpp
     algorithms/impl/common/unpack.cpp
+    algorithms/impl/host/search_sorted_host.cpp
 
-    # cuda
+    # thrust/cuda
     containers/impl/thrust/vector_malloc.cu
     containers/impl/thrust/vector_access.cu
     algorithms/impl/thrust/remove_if.cu
@@ -44,6 +45,8 @@ add_library(
     algorithms/impl/thrust/cast.cu
     algorithms/impl/thrust/arange.cu
     algorithms/impl/thrust/intersection.cu
+    algorithms/impl/thrust/search_sorted.cu
+    algorithms/impl/cuda/search_sorted_device.cu
 )
 
 target_compile_options(
@@ -103,3 +106,4 @@ AddMaelstromTest(test_math.exe tests/test_math.cpp)
 AddMaelstromTest(test_cast.exe tests/test_cast.cpp)
 AddMaelstromTest(test_arange.exe tests/test_arange.cpp)
 AddMaelstromTest(test_intersection.exe tests/test_intersection.cpp)
+AddMaelstromTest(test_search_sorted.exe tests/test_search_sorted.cpp)

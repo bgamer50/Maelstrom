@@ -189,12 +189,12 @@ namespace maelstrom {
         Makes a new vector of appropriate data type from the given vector of anys
         with the given storage type.
    */
-   inline maelstrom::vector make_vector_from_anys(maelstrom::storage mem_type, std::vector<boost::any>& anys);
+   maelstrom::vector make_vector_from_anys(maelstrom::storage mem_type, std::vector<boost::any>& anys);
 
    /*
         Makes a new vector of the given data type from the given vector of anys
         with the given storage type.
    */
-   inline maelstrom::vector make_vector_from_anys(maelstrom::storage mem_type, maelstrom::dtype_t dtype, std::vector<boost::any>& anys);
+   maelstrom::vector make_vector_from_anys(maelstrom::storage mem_type, maelstrom::dtype_t dtype, std::vector<boost::any>& anys);
 
 }

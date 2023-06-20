@@ -11,6 +11,7 @@
 #include <thrust/scan.h>
 #include <thrust/transform_scan.h>
 #include <thrust/gather.h>
+#include <thrust/binary_search.h>
 
 #include <thrust/adjacent_difference.h>
 #include <thrust/set_operations.h>
@@ -194,35 +195,6 @@ namespace maelstrom {
                 thrust::get<0>(left) * thrust::get<0>(right),
                 thrust::get<1>(left)
             );
-        }
-    };
-
-
-    template <typename T>
-    struct math_binary_plus : public thrust::unary_function<thrust::tuple<T, T>, T> {
-        __device__ __host__ T operator()(const thrust::tuple<T, T> input) {
-            return thrust::get<0>(input) + thrust::get<1>(input);
-        }
-    };
-
-    template <typename T>
-    struct math_binary_minus : public thrust::unary_function<thrust::tuple<T, T>, T> {
-        __device__ __host__ T operator()(const thrust::tuple<T, T> input) {
-            return thrust::get<0>(input) - thrust::get<1>(input);
-        }
-    };
-
-    template <typename T>
-    struct math_binary_times : public thrust::unary_function<thrust::tuple<T, T>, T> {
-        __device__ __host__ T operator()(const thrust::tuple<T, T> input) {
-            return thrust::get<0>(input) * thrust::get<1>(input);
-        }
-    };
-
-    template <typename T>
-    struct math_binary_divide : public thrust::unary_function<thrust::tuple<T, T>, T> {
-        __device__ __host__ T operator()(const thrust::tuple<T, T> input) {
-            return thrust::get<0>(input) / thrust::get<1>(input);
         }
     };
 }

@@ -1,5 +1,6 @@
 #include "maelstrom/algorithms/math.h"
 #include "maelstrom/thrust_utils/thrust_utils.cuh"
+#include "maelstrom/thrust_utils/thrust_math.cuh"
 #include "maelstrom/thrust_utils/execution.cuh"
 
 namespace maelstrom {
