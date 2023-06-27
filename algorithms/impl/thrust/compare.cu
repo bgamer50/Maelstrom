@@ -1,5 +1,6 @@
 #include "maelstrom/algorithms/compare.h"
 #include "maelstrom/thrust_utils/thrust_utils.cuh"
+#include "maelstrom/thrust_utils/thrust_comparison.cuh"
 
 namespace maelstrom {
 

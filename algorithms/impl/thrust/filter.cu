@@ -1,5 +1,6 @@
 #include "maelstrom/algorithms/filter.h"
 #include "maelstrom/thrust_utils/thrust_utils.cuh"
+#include "maelstrom/thrust_utils/thrust_comparison.cuh"
 
 #include <sstream>
 

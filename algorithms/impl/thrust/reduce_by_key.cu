@@ -5,6 +5,7 @@
 
 #include "maelstrom/thrust_utils/execution.cuh"
 #include "maelstrom/thrust_utils/thrust_utils.cuh"
+#include "maelstrom/thrust_utils/thrust_reduction.cuh"
 
 namespace maelstrom {
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "maelstrom/thrust_utils/thrust_utils.cuh"
 
 namespace maelstrom {

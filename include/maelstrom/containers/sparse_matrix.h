@@ -35,6 +35,18 @@ namespace maelstrom {
             virtual size_t num_nonzero() = 0;
 
             /*
+                Returns true if this matrix is sorted (row then col for COO,
+                col for CSR, row for CSC), otherwise returns false.
+            */
+            virtual bool is_sorted() = 0;
+
+            /*
+                Sorts this sparse matrix (row then col for COO, col for CSR,
+                row for CSC).
+            */
+            virtual void sort() = 0;
+
+            /*
                 Returns the format of this matrix. 
             */
             virtual sparse_matrix_format get_format() = 0;
@@ -47,9 +59,45 @@ namespace maelstrom {
             virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector> get_entries_1d(maelstrom::vector& ix_1d) = 0;
 
             /*
-                Gets the entries corresponding to the 2d index
+                Gets the rows corresponding to the 1d index
             */
-            virtual maelstrom::vector get_entries_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) = 0;
+            virtual maelstrom::vector get_rows_1d(maelstrom::vector& ix_1d) = 0;
+
+            /*
+                Gets the columns corresponding to the 1d index
+            */
+            virtual maelstrom::vector get_cols_1d(maelstrom::vector& ix_1d) = 0;
+
+            /*
+                Gets the values corresponding to the 1d index,
+                can be empty if there are no values (sparse matrix)
+            */
+            virtual maelstrom::vector get_values_1d(maelstrom::vector& ix_1d) = 0;
+
+            /*
+                Gets the values corresponding to the 2d index
+                For matrices with multiple values for the same index
+                (i.e. a matrix representing a multi-graph), this will
+                only return one arbitrary value, which is not guaranteed
+                to be the same value each time.
+            */
+            virtual maelstrom::vector get_values_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) = 0;
+
+            /*
+                Depending on the format of this matrix, this operation is slightly different.
+                
+                For CSR, gets the nonzero columns and values.  For a matrix with multiple values
+                for the same index, it will return all values.
+
+                For CSC, gets the nonzero rows and values.  For a matrix with multiple values for
+                the same index, it will return all values.
+
+                For COO, this operation is invalid and will throw an exception.
+
+                In all cases, returns a tuple of (original indices, rows/cols, values).
+                Values can be an empty vector if this matrix has no values.
+            */
+            virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix) = 0;
 
             /*
                 Sets (row, col) = val for each row/col/val in rows/cols/vals.
@@ -68,6 +116,8 @@ namespace maelstrom {
 
             size_t n_rows;
             size_t n_cols;
+
+            bool sorted;
         
         public:
             basic_sparse_matrix(maelstrom::vector row, maelstrom::vector col, maelstrom::vector values, maelstrom::sparse_matrix_format format);
@@ -97,14 +147,32 @@ namespace maelstrom {
                 throw std::runtime_error("Invalid matrix format");
             }
 
+            using sparse_matrix::is_sorted;
+            inline virtual bool is_sorted() { return this->sorted; }
+
+            using sparse_matrix::sort;
+            virtual void sort();
+
             using sparse_matrix::get_format;
             inline virtual sparse_matrix_format get_format() { return this->format; }
 
             using sparse_matrix::get_entries_1d;
             virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector> get_entries_1d(maelstrom::vector& ix_1d);
 
-            using sparse_matrix::get_entries_2d;
-            virtual maelstrom::vector get_entries_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c);
+            using sparse_matrix::get_rows_1d;
+            virtual maelstrom::vector get_rows_1d(maelstrom::vector& ix_1d);
+
+            using sparse_matrix::get_cols_1d;
+            virtual maelstrom::vector get_cols_1d(maelstrom::vector& ix_1d);
+
+            using sparse_matrix::get_values_1d;
+            virtual maelstrom::vector get_values_1d(maelstrom::vector& ix_1d);
+
+            using sparse_matrix::get_values_2d;
+            virtual maelstrom::vector get_values_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c);
+
+            using sparse_matrix::query_adjacency;
+            virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix);
 
             using sparse_matrix::set;
             virtual void set(maelstrom::vector& rows, maelstrom::vector& cols, std::optional<maelstrom::vector&> vals=std::nullopt);

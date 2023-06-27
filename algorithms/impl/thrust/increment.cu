@@ -2,20 +2,23 @@
 
 #include "maelstrom/thrust_utils/thrust_utils.cuh"
 #include "maelstrom/thrust_utils/execution.cuh"
+#include "maelstrom/util/any_utils.cuh"
 
 namespace maelstrom {
 
     template<typename E, typename T>
-    void t_increment(E exec_policy, maelstrom::vector& vec, boost::any inc, size_t start, size_t end) {
+    void t_increment(E exec_policy, maelstrom::vector& vec, boost::any inc, size_t start, size_t end, bool decrement) {
         T inc_val;
-        try {
-            inc_val = boost::any_cast<T>(inc);
-        } catch(boost::bad_any_cast& err) {
-            throw std::runtime_error("Type of value does not match type of array in increment()");
+
+        if(inc.empty()) {
+            inc_val = static_cast<T>(1);
+        } else {
+            inc_val = boost::any_cast<T>(maelstrom::safe_any_cast(inc, vec.get_dtype()));
         }
 
         maelstrom::unary_plus_op<T> adder;
         adder.plus_val = inc_val;
+        adder.subtract = decrement;
 
         thrust::transform(
             exec_policy,
@@ -27,30 +30,30 @@ namespace maelstrom {
     }
 
     template<typename E>
-    void increment_dispatch_val(E exec_policy, maelstrom::vector& vec, boost::any inc, size_t start, size_t end) {
+    void increment_dispatch_val(E exec_policy, maelstrom::vector& vec, boost::any inc, size_t start, size_t end, bool decrement) {
         switch(vec.get_dtype().prim_type) {
             case UINT64:
-                return t_increment<E, uint64_t>(exec_policy, vec, inc, start, end);
+                return t_increment<E, uint64_t>(exec_policy, vec, inc, start, end, decrement);
             case UINT32:
-                return t_increment<E, uint32_t>(exec_policy, vec, inc, start, end);
+                return t_increment<E, uint32_t>(exec_policy, vec, inc, start, end, decrement);
             case UINT8:
-                return t_increment<E, uint8_t>(exec_policy, vec, inc, start, end);
+                return t_increment<E, uint8_t>(exec_policy, vec, inc, start, end, decrement);
             case INT64:
-                return t_increment<E, int64_t>(exec_policy, vec, inc, start, end);
+                return t_increment<E, int64_t>(exec_policy, vec, inc, start, end, decrement);
             case INT32:
-                return t_increment<E, int32_t>(exec_policy, vec, inc, start, end);
+                return t_increment<E, int32_t>(exec_policy, vec, inc, start, end, decrement);
             case INT8:
-                return t_increment<E, int8_t>(exec_policy, vec, inc, start, end);
+                return t_increment<E, int8_t>(exec_policy, vec, inc, start, end, decrement);
             case FLOAT64:
-                return t_increment<E, double>(exec_policy, vec, inc, start, end);
+                return t_increment<E, double>(exec_policy, vec, inc, start, end, decrement);
             case FLOAT32:
-                return t_increment<E, float>(exec_policy, vec, inc, start, end);
+                return t_increment<E, float>(exec_policy, vec, inc, start, end, decrement);
         }
 
         throw std::runtime_error("invalid primitive type provided to increment");
     }
 
-    void increment_dispatch_exec_policy(maelstrom::vector& vec, boost::any inc, size_t start, size_t end) {
+    void increment_dispatch_exec_policy(maelstrom::vector& vec, boost::any inc, size_t start, size_t end, bool decrement) {
         boost::any exec_policy = maelstrom::get_execution_policy(vec).get();
         const std::type_info& t = exec_policy.type();
         
@@ -60,7 +63,8 @@ namespace maelstrom {
                 vec,
                 inc,
                 start,
-                end
+                end,
+                decrement
             );
         } else if(typeid(host_exec_t) == t) {
             return increment_dispatch_val(
@@ -68,18 +72,19 @@ namespace maelstrom {
                 vec,
                 inc,
                 start,
-                end
+                end,
+                decrement
             );
         }
 
         throw std::runtime_error("Invalid execution policy for increment");
     }
 
-    void increment(maelstrom::vector& vec, boost::any inc, size_t start, size_t end) {
+    void increment(maelstrom::vector& vec, boost::any inc, size_t start, size_t end, bool decrement) {
         if(start > vec.size() - 1) throw std::runtime_error("Start out of range!");
         if(end > vec.size()) throw std::runtime_error("End out of range!");
 
-        increment_dispatch_exec_policy(vec, inc, start, end);
+        increment_dispatch_exec_policy(vec, inc, start, end, decrement);
     }
 
 }

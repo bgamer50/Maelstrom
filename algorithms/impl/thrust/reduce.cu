@@ -1,5 +1,6 @@
 #include "maelstrom/algorithms/reduce.h"
 #include "maelstrom/thrust_utils/thrust_utils.cuh"
+#include "maelstrom/thrust_utils/thrust_reduction.cuh"
 
 namespace maelstrom {
 
