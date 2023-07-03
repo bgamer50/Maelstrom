@@ -20,6 +20,11 @@ namespace maelstrom {
             virtual bool has_values() = 0;
 
             /*
+                Returns true if this matrix has relations, false otherwise.
+            */
+            virtual bool has_relations() = 0;
+
+            /*
                 Returns the number of rows in the matrix.
             */
             virtual size_t num_rows() = 0;
@@ -53,10 +58,11 @@ namespace maelstrom {
 
             /*
                 Gets the entries corresponding to the 1d index
-                Returns (rows, cols, vals).  Vals may be an empty vector
-                if this matrix has no values (adjacency matrix).
+                Returns (rows, cols, vals, relations).  Vals may be an empty vector
+                if this matrix has no values (adjacency matrix).  Relations may
+                be empty if this matrix has no relations.
             */
-            virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector> get_entries_1d(maelstrom::vector& ix_1d) = 0;
+            virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> get_entries_1d(maelstrom::vector& ix_1d) = 0;
 
             /*
                 Gets the rows corresponding to the 1d index
@@ -83,6 +89,12 @@ namespace maelstrom {
             */
             virtual maelstrom::vector get_values_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) = 0;
 
+            virtual maelstrom::vector get_relations_1d(maelstrom::vector& ix_1d) = 0;
+
+            virtual maelstrom::vector get_relations_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) = 0;
+
+            virtual maelstrom::vector get_1d_index_from_2d_index(maelstrom::vector& ix_r, maelstrom::vector& ix_c) = 0;
+
             /*
                 Depending on the format of this matrix, this operation is slightly different.
                 
@@ -94,16 +106,20 @@ namespace maelstrom {
 
                 For COO, this operation is invalid and will throw an exception.
 
-                In all cases, returns a tuple of (original indices, rows/cols, values).
+                In all cases, returns a tuple of (original indices, rows/cols, values, relations).
                 Values can be an empty vector if this matrix has no values.
+
+                Has flags to return the inner index (col for CSR, row for CSC), values, and relations.
+                Defaults to only returning the inner index (return_inner=true, return_values=false, return_relations=false).
             */
-            virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix) = 0;
+            virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix, maelstrom::vector& rel_types, bool return_inner=true, bool return_values=false, bool return_relations=false) = 0;
 
             /*
                 Sets (row, col) = val for each row/col/val in rows/cols/vals.
                 If vals is not provided, just sets the row/col (adjacency matrix).
+                Can optionally set relation too.
             */
-            virtual void set(maelstrom::vector& rows, maelstrom::vector& cols, std::optional<maelstrom::vector&> vals=std::nullopt) = 0;
+            virtual void set(maelstrom::vector& rows, maelstrom::vector& cols, std::optional<maelstrom::vector&> vals=std::nullopt, std::optional<maelstrom::vector&> relations=std::nullopt) = 0;
     };
 
     class basic_sparse_matrix: public sparse_matrix {
@@ -111,6 +127,7 @@ namespace maelstrom {
             maelstrom::vector row;
             maelstrom::vector col;
             maelstrom::vector val;
+            maelstrom::vector rel;
 
             maelstrom::sparse_matrix_format format;
 
@@ -120,11 +137,16 @@ namespace maelstrom {
             bool sorted;
         
         public:
-            basic_sparse_matrix(maelstrom::vector row, maelstrom::vector col, maelstrom::vector values, maelstrom::sparse_matrix_format format);
+            basic_sparse_matrix(maelstrom::vector row, maelstrom::vector col, maelstrom::vector values, maelstrom::vector relations, maelstrom::sparse_matrix_format format);
 
             using sparse_matrix::has_values;
             inline virtual bool has_values() {
                 return !this->val.empty();
+            }
+
+            using sparse_matrix::has_relations;
+            inline virtual bool has_relations() {
+                return !this->rel.empty();
             }
 
             using sparse_matrix::num_rows;
@@ -157,7 +179,7 @@ namespace maelstrom {
             inline virtual sparse_matrix_format get_format() { return this->format; }
 
             using sparse_matrix::get_entries_1d;
-            virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector> get_entries_1d(maelstrom::vector& ix_1d);
+            virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> get_entries_1d(maelstrom::vector& ix_1d);
 
             using sparse_matrix::get_rows_1d;
             virtual maelstrom::vector get_rows_1d(maelstrom::vector& ix_1d);
@@ -169,13 +191,28 @@ namespace maelstrom {
             virtual maelstrom::vector get_values_1d(maelstrom::vector& ix_1d);
 
             using sparse_matrix::get_values_2d;
-            virtual maelstrom::vector get_values_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c);
+            inline virtual maelstrom::vector get_values_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) {
+                auto ix_1d = this->get_1d_index_from_2d_index(ix_r, ix_c);
+                return maelstrom::select(this->val, ix_1d);
+            }
+
+            using sparse_matrix::get_relations_1d;
+            virtual maelstrom::vector get_relations_1d(maelstrom::vector& ix_1d);
+
+            using sparse_matrix::get_relations_2d;
+            inline virtual maelstrom::vector get_relations_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) {
+                auto ix_1d = this->get_1d_index_from_2d_index(ix_r, ix_c);
+                return maelstrom::select(this->rel, ix_1d);
+            }
+
+            using sparse_matrix::get_1d_index_from_2d_index;
+            virtual maelstrom::vector get_1d_index_from_2d_index(maelstrom::vector& ix_r, maelstrom::vector& ix_c);
 
             using sparse_matrix::query_adjacency;
-            virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix);
+            virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix, maelstrom::vector& rel_types, bool return_inner=true, bool return_values=false, bool return_relations=false);
 
             using sparse_matrix::set;
-            virtual void set(maelstrom::vector& rows, maelstrom::vector& cols, std::optional<maelstrom::vector&> vals=std::nullopt);
+            virtual void set(maelstrom::vector& rows, maelstrom::vector& cols, std::optional<maelstrom::vector&> vals=std::nullopt, std::optional<maelstrom::vector&> relations=std::nullopt);
     };
 
 }
