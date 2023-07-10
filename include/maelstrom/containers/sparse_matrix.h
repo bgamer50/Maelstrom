@@ -86,14 +86,19 @@ namespace maelstrom {
                 (i.e. a matrix representing a multi-graph), this will
                 only return one arbitrary value, which is not guaranteed
                 to be the same value each time.
+
+                Returns originating indices, values
             */
-            virtual maelstrom::vector get_values_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) = 0;
+            virtual std::pair<maelstrom::vector, maelstrom::vector> get_values_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) = 0;
 
             virtual maelstrom::vector get_relations_1d(maelstrom::vector& ix_1d) = 0;
 
-            virtual maelstrom::vector get_relations_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) = 0;
+            /*
+                Returns originating indices, relations
+            */
+            virtual std::pair<maelstrom::vector, maelstrom::vector> get_relations_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) = 0;
 
-            virtual maelstrom::vector get_1d_index_from_2d_index(maelstrom::vector& ix_r, maelstrom::vector& ix_c) = 0;
+            virtual maelstrom::vector get_1d_index_from_2d_index(maelstrom::vector& ix_r, maelstrom::vector& ix_c, boost::any index_not_found=boost::any()) = 0;
 
             /*
                 Depending on the format of this matrix, this operation is slightly different.
@@ -119,7 +124,11 @@ namespace maelstrom {
                 If vals is not provided, just sets the row/col (adjacency matrix).
                 Can optionally set relation too.
             */
-            virtual void set(maelstrom::vector& rows, maelstrom::vector& cols, std::optional<maelstrom::vector&> vals=std::nullopt, std::optional<maelstrom::vector&> relations=std::nullopt) = 0;
+            virtual void set(maelstrom::vector new_rows, maelstrom::vector new_cols, maelstrom::vector new_vals=maelstrom::vector(), maelstrom::vector new_rels=maelstrom::vector()) = 0;
+
+            virtual void to_csr() = 0;
+            virtual void to_csc() = 0;
+            virtual void to_coo() = 0;
     };
 
     class basic_sparse_matrix: public sparse_matrix {
@@ -191,28 +200,31 @@ namespace maelstrom {
             virtual maelstrom::vector get_values_1d(maelstrom::vector& ix_1d);
 
             using sparse_matrix::get_values_2d;
-            inline virtual maelstrom::vector get_values_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) {
-                auto ix_1d = this->get_1d_index_from_2d_index(ix_r, ix_c);
-                return maelstrom::select(this->val, ix_1d);
-            }
+            virtual std::pair<maelstrom::vector, maelstrom::vector> get_values_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c);
 
             using sparse_matrix::get_relations_1d;
             virtual maelstrom::vector get_relations_1d(maelstrom::vector& ix_1d);
 
             using sparse_matrix::get_relations_2d;
-            inline virtual maelstrom::vector get_relations_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) {
-                auto ix_1d = this->get_1d_index_from_2d_index(ix_r, ix_c);
-                return maelstrom::select(this->rel, ix_1d);
-            }
+            virtual std::pair<maelstrom::vector, maelstrom::vector> get_relations_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c);
 
             using sparse_matrix::get_1d_index_from_2d_index;
-            virtual maelstrom::vector get_1d_index_from_2d_index(maelstrom::vector& ix_r, maelstrom::vector& ix_c);
+            virtual maelstrom::vector get_1d_index_from_2d_index(maelstrom::vector& ix_r, maelstrom::vector& ix_c, boost::any index_not_found=boost::any());
 
             using sparse_matrix::query_adjacency;
             virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix, maelstrom::vector& rel_types, bool return_inner=true, bool return_values=false, bool return_relations=false);
 
             using sparse_matrix::set;
-            virtual void set(maelstrom::vector& rows, maelstrom::vector& cols, std::optional<maelstrom::vector&> vals=std::nullopt, std::optional<maelstrom::vector&> relations=std::nullopt);
+            virtual void set(maelstrom::vector new_rows, maelstrom::vector new_cols, maelstrom::vector new_vals=maelstrom::vector(), maelstrom::vector new_rels=maelstrom::vector());
+
+            using sparse_matrix::to_csr;
+            virtual void to_csr();
+
+            using sparse_matrix::to_csc;
+            virtual void to_csc();
+
+            using sparse_matrix::to_coo;
+            virtual void to_coo();
     };
 
 }

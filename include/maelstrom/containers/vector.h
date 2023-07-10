@@ -93,7 +93,7 @@ namespace maelstrom {
             
             inline size_t size() { return this->filled_size; }
 
-            inline bool empty() { return this->filled_size > 0; }
+            inline bool empty() { return this->filled_size == 0; }
 
             inline void* data() {
                 return this->data_ptr;

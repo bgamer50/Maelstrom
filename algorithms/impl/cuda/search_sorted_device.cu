@@ -45,6 +45,7 @@ namespace maelstrom {
             sz
         );
         cudaDeviceSynchronize();
+        maelstrom::cuda::cudaCheckErrors("k_search_sorted");
 
         return output;
     }

@@ -4,7 +4,7 @@ namespace maelstrom {
     namespace sparse {
 
         template <typename I, typename R>
-        void k_query_adjacency_get_mem(I* row, I* col, R* rel, I* query, size_t query_size, R* query_rel, size_t query_rel_size, size_t* output_memory) {            
+        void h_query_adjacency_get_mem(I* row, I* col, R* rel, I* query, size_t query_size, R* query_rel, size_t query_rel_size, size_t* output_memory) {            
             const bool filter_rel = query_rel_size > 0;
 
             // TODO parallelize
@@ -37,7 +37,7 @@ namespace maelstrom {
         }
 
         template <typename I, typename V, typename R>
-        void k_query_adjacency(I* row, I* col, R* rel, V* val, I* query, size_t query_size, R* query_rel, size_t query_rel_size, size_t* ps, size_t* origin, I* adjacent, R* rel_adjacent, V* val_adjacent, bool return_adj, bool return_rel, bool return_val) {            
+        void h_query_adjacency(I* row, I* col, R* rel, V* val, I* query, size_t query_size, R* query_rel, size_t query_rel_size, size_t* ps, size_t* origin, I* adjacent, R* rel_adjacent, V* val_adjacent, bool return_adj, bool return_rel, bool return_val) {            
             const bool filter_rel = query_rel_size > 0;
 
             for(size_t i = 0; i < query_size; ++i) {
@@ -106,8 +106,8 @@ namespace maelstrom {
 
             maelstrom::vector origin(row.get_mem_type(), uint64, output_size);
             maelstrom::vector adjacent(row.get_mem_type(), row.get_dtype(), return_inner ? output_size : 0);
-            maelstrom::vector rel_adjacent(row.get_mem_type(), row.get_dtype(), return_relations ? output_size : 0);
-            maelstrom::vector val_adjacent(row.get_mem_type(), row.get_dtype(), return_values ? output_size : 0);
+            maelstrom::vector rel_adjacent(row.get_mem_type(), rel.get_dtype(), return_relations ? output_size : 0);
+            maelstrom::vector val_adjacent(row.get_mem_type(), val.get_dtype(), return_values ? output_size : 0);
 
             h_query_adjacency(
                 static_cast<I*>(row.data()),
@@ -128,7 +128,7 @@ namespace maelstrom {
                 return_values
             );
 
-            return std::make_pair(
+            return std::make_tuple(
                 std::move(origin),
                 std::move(adjacent),
                 std::move(val_adjacent),
@@ -147,6 +147,20 @@ namespace maelstrom {
                                                                                                                                  bool return_values,
                                                                                                                                  bool return_relations) 
         {
+            if(rel_types.empty()) {
+                return exec_query_adjacency_host<I, V, uint8_t>(
+                    row,
+                    col,
+                    val,
+                    rel,
+                    ix,
+                    rel_types,
+                    return_inner,
+                    return_values,
+                    return_relations
+                );
+            }
+
             // only support uint8 for now
             switch(rel.get_dtype().prim_type) {
                 case UINT8:
@@ -316,6 +330,30 @@ namespace maelstrom {
                     );
                 case UINT8:
                     return query_adjacency_host_dispatch_val<uint8_t>(
+                        row,
+                        col,
+                        val,
+                        rel,
+                        ix,
+                        rel_types,
+                        return_inner,
+                        return_values,
+                        return_relations
+                    );
+                case INT64:
+                    return query_adjacency_host_dispatch_val<int64_t>(
+                        row,
+                        col,
+                        val,
+                        rel,
+                        ix,
+                        rel_types,
+                        return_inner,
+                        return_values,
+                        return_relations
+                    );
+                case INT32:
+                    return query_adjacency_host_dispatch_val<int32_t>(
                         row,
                         col,
                         val,

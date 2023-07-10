@@ -25,7 +25,7 @@ namespace maelstrom {
             );
         }
 
-        throw std::runtime_error("Invalid execution policy for select");
+        throw std::runtime_error("Invalid execution policy for search sorted");
     }
 
     maelstrom::vector search_sorted(maelstrom::vector& sorted_array, maelstrom::vector& values_to_find) {

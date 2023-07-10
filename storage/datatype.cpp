@@ -1,4 +1,5 @@
 #include "maelstrom/storage/datatype.h"
+#include <limits>
 
 namespace maelstrom {
 
@@ -105,6 +106,29 @@ namespace maelstrom {
         }
 
         return std::make_pair(bytes, prim_type);
+    }
+
+    boost::any max_value(dtype_t& dtype) {
+        switch(dtype.prim_type) {
+            case UINT64:
+                return std::numeric_limits<uint64_t>::max();
+            case UINT32:
+                return std::numeric_limits<uint32_t>::max();
+            case UINT8:
+                return std::numeric_limits<uint8_t>::max();
+            case INT64:
+                return std::numeric_limits<int64_t>::max();
+            case INT32:
+                return std::numeric_limits<int32_t>::max();
+            case INT8:
+                return std::numeric_limits<int8_t>::max();
+            case FLOAT64:
+                return std::numeric_limits<double>::max();
+            case FLOAT32:
+                return std::numeric_limits<float>::max();
+        }
+
+        throw std::runtime_error("invalid dtype provided to max_value");
     }
 
     bool dtype_t::operator==(const dtype_t& other) {

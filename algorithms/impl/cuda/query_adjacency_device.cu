@@ -1,5 +1,7 @@
 #include "maelstrom/containers/vector.h"
 #include "maelstrom/util/cuda_utils.cuh"
+#include "maelstrom/thrust_utils/thrust_utils.cuh"
+#include "maelstrom/thrust_utils/execution.cuh"
 
 namespace maelstrom {
     namespace sparse {
@@ -124,8 +126,8 @@ namespace maelstrom {
 
             maelstrom::vector origin(row.get_mem_type(), uint64, output_size);
             maelstrom::vector adjacent(row.get_mem_type(), row.get_dtype(), return_inner ? output_size : 0);
-            maelstrom::vector rel_adjacent(row.get_mem_type(), row.get_dtype(), return_relations ? output_size : 0);
-            maelstrom::vector val_adjacent(row.get_mem_type(), row.get_dtype(), return_values ? output_size : 0);
+            maelstrom::vector rel_adjacent(row.get_mem_type(), rel.get_dtype(), return_relations ? output_size : 0);
+            maelstrom::vector val_adjacent(row.get_mem_type(), val.get_dtype(), return_values ? output_size : 0);
 
             k_query_adjacency<<<num_blocks, MAELSTROM_DEFAULT_BLOCK_SIZE>>>(
                 static_cast<I*>(row.data()),
@@ -148,7 +150,7 @@ namespace maelstrom {
             cudaDeviceSynchronize();
             maelstrom::cuda::cudaCheckErrors("k_query_adjacency");
 
-            return std::make_pair(
+            return std::make_tuple(
                 std::move(origin),
                 std::move(adjacent),
                 std::move(val_adjacent),
@@ -168,6 +170,21 @@ namespace maelstrom {
                                                                                                                             bool return_values,
                                                                                                                             bool return_relations) 
         {
+            if(rel_types.empty()) {
+                return exec_query_adjacency_device<E, I, V, uint8_t>(
+                    execution_policy,
+                    row,
+                    col,
+                    val,
+                    rel,
+                    ix,
+                    rel_types,
+                    return_inner,
+                    return_values,
+                    return_relations
+                );
+            }
+
             // only support uint8 for now
             switch(rel.get_dtype().prim_type) {
                 case UINT8:
@@ -362,10 +379,48 @@ namespace maelstrom {
                         return_values,
                         return_relations
                     );
+                case INT64:
+                    return query_adjacency_device_dispatch_val<E, int64_t>(
+                        execution_policy,
+                        row,
+                        col,
+                        val,
+                        rel,
+                        ix,
+                        rel_types,
+                        return_inner,
+                        return_values,
+                        return_relations
+                    );
+                case INT32:
+                    return query_adjacency_device_dispatch_val<E, int32_t>(
+                        execution_policy,
+                        row,
+                        col,
+                        val,
+                        rel,
+                        ix,
+                        rel_types,
+                        return_inner,
+                        return_values,
+                        return_relations
+                    );
             }
 
             throw std::runtime_error("unsupported index type for query adjacency");
         }
+
+        template
+        std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency_device_dispatch_ix(maelstrom::device_exec_t execution_policy,
+                                                                                                                                maelstrom::vector& row,
+                                                                                                                                maelstrom::vector& col,
+                                                                                                                                maelstrom::vector& val,
+                                                                                                                                maelstrom::vector& rel,
+                                                                                                                                maelstrom::vector& ix,
+                                                                                                                                maelstrom::vector& rel_types,
+                                                                                                                                bool return_inner,
+                                                                                                                                bool return_values,
+                                                                                                                                bool return_relations);
 
     }
 }

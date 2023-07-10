@@ -26,6 +26,8 @@ add_library(
     storage/datatype.cpp
     algorithms/impl/common/unpack.cpp
     algorithms/impl/host/search_sorted_host.cpp
+    algorithms/impl/host/query_adjacency_host.cpp
+    algorithms/impl/host/search_sorted_sparse_host.cpp
 
     # thrust/cuda
     containers/impl/thrust/vector_malloc.cu
@@ -46,7 +48,11 @@ add_library(
     algorithms/impl/thrust/arange.cu
     algorithms/impl/thrust/intersection.cu
     algorithms/impl/thrust/search_sorted.cu
+    algorithms/impl/thrust/search_sorted_sparse.cu
+    algorithms/impl/thrust/query_adjacency.cu
     algorithms/impl/cuda/search_sorted_device.cu
+    algorithms/impl/cuda/query_adjacency_device.cu
+    algorithms/impl/cuda/search_sorted_sparse_device.cu
 )
 
 target_compile_options(
@@ -107,3 +113,5 @@ AddMaelstromTest(test_cast.exe tests/test_cast.cpp)
 AddMaelstromTest(test_arange.exe tests/test_arange.cpp)
 AddMaelstromTest(test_intersection.exe tests/test_intersection.cpp)
 AddMaelstromTest(test_search_sorted.exe tests/test_search_sorted.cpp)
+AddMaelstromTest(test_search_sorted_sparse.exe tests/test_search_sorted_sparse.cpp)
+AddMaelstromTest(test_query_adjacency.exe tests/test_query_adjacency.cpp)

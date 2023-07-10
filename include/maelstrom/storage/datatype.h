@@ -27,6 +27,8 @@ namespace maelstrom {
 
     std::pair<std::vector<unsigned char>, primitive_t> any_to_bytes(boost::any& a);
 
+    boost::any max_value(maelstrom::dtype_t& dtype);
+
     extern dtype_t uint64;
     extern dtype_t uint32;
     extern dtype_t uint8;
