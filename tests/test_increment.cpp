@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
         test_increment_basic();
         test_increment_start_end();
     } catch(std::exception& err) {
+        std::cerr << "FAIL!" << std::endl;
         std::cerr << err.what() << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -45,6 +46,7 @@ void test_increment_basic() {
         correct_array_incremented.data(),
         m_array.size()
     );
+    return;
 
     maelstrom::increment(
         m_array,

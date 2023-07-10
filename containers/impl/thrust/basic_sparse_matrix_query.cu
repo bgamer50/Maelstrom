@@ -18,7 +18,8 @@ namespace maelstrom {
 
         // CSR
         auto row = maelstrom::search_sorted(this->row, ix_1d);
-        maelstrom::increment(row, true); // decrement by 1
+        if(row.get_dtype() != this->row.get_dtype()) row = row.astype(this->row.get_dtype());
+        maelstrom::increment(row, DECREMENT); // decrement by 1
         return row;
     }
 
@@ -29,19 +30,22 @@ namespace maelstrom {
 
         // CSC
         auto col = maelstrom::search_sorted(this->col, ix_1d);
-        maelstrom::increment(col, true); // decrement by 1
+        if(col.get_dtype() != this->col.get_dtype()) col = col.astype(this->row.get_dtype());
+        maelstrom::increment(col, DECREMENT); // decrement by 1
         return col;
     }
 
     maelstrom::vector basic_sparse_matrix::get_values_1d(maelstrom::vector& ix_1d) {
+        if(this->val.empty()) return maelstrom::vector();
         return maelstrom::select(this->val, ix_1d);
     }
 
     maelstrom::vector basic_sparse_matrix::get_relations_1d(maelstrom::vector& ix_1d) {
+        if(this->rel.empty()) return maelstrom::vector();
         return maelstrom::select(this->rel, ix_1d);
     }
 
-    std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> maelstrom::basic_sparse_matrix::get_entries_1d(maelstrom::vector& ix_1d) {
+    std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> basic_sparse_matrix::get_entries_1d(maelstrom::vector& ix_1d) {
         // TODO validity checking of edge ids
 
         return std::make_tuple(
@@ -131,7 +135,7 @@ namespace maelstrom {
         throw std::runtime_error("adj-querying a COO matrix is unsupported");
     }
 
-    void basic_sparse_matrix::set(maelstrom::vector new_rows, maelstrom::vector new_cols, maelstrom::vector new_vals=maelstrom::vector(), maelstrom::vector new_rels=maelstrom::vector()) {
+    void basic_sparse_matrix::set(maelstrom::vector new_rows, maelstrom::vector new_cols, maelstrom::vector new_vals, maelstrom::vector new_rels) {
         if(this->format != COO) throw std::runtime_error("Can only set for a COO matrix");
 
         if(new_rows.size() != new_cols.size()) throw std::runtime_error("new rows size must match new cols size");
@@ -164,6 +168,8 @@ namespace maelstrom {
                 new_rels
             );
         }
+
+        this->sorted = false;
     }
 
 }

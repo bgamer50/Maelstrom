@@ -1,5 +1,5 @@
 #include "maelstrom/containers/vector.h"
-#include "maelstrom/algorithms/unpack.h"
+#include "maelstrom/algorithms/prefix_sum.h"
 #include "test_utils.hpp"
 
 #include <vector>
@@ -7,11 +7,11 @@
 
 using namespace maelstrom::test;
 
-void test_unpack_basic();
+void test_prefix_sum_basic();
 
 int main(int argc, char* argv[]) {
     try {
-        test_unpack_basic();
+        test_prefix_sum_basic();
     } catch(std::exception& err) {
         std::cerr << "FAIL!" << std::endl;
         std::cerr << err.what() << std::endl;
@@ -21,24 +21,22 @@ int main(int argc, char* argv[]) {
     std::cout << "DONE!" << std::endl;
 }
 
-void test_unpack_basic() {
-    std::vector<int> data = {0, 1, 2, 3, 4, 5, 6, 7};
-
+void test_prefix_sum_basic() {
+    std::vector<int> data = {1, 3, 0, 2, 4, 5, 0, 1, 2, 1, 2, 3, 4, 0, 2, 5};
+    
     maelstrom::vector m_data(
-        maelstrom::storage::MANAGED,
+        maelstrom::MANAGED,
         maelstrom::int32,
         data.data(),
         data.size(),
         false
     );
 
-    auto unpacked_m_data = maelstrom::unpack(m_data);
+    maelstrom::prefix_sum(
+        m_data
+    );
 
-    for(auto& v : unpacked_m_data) assert( v.size() == 1 );
+    std::vector<int> expected = {1, 4, 4, 6, 10, 15, 15, 16, 18, 19, 21, 24, 28, 28, 30, 35};
 
-    for(size_t k = 0; k < unpacked_m_data.size(); ++k) {
-        assert( 
-            boost::any_cast<int32_t>(unpacked_m_data[k].get(0)) == data[k]
-        );
-    }
+    assert_array_equals(static_cast<int*>(m_data.data()), expected.data(), expected.size());
 }

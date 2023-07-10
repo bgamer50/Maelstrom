@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
     try {
         test_math_binary();
     } catch(std::exception& err) {
+        std::cerr << "FAIL!" << std::endl;
         std::cerr << err.what() << std::endl;
         exit(EXIT_FAILURE);
     }

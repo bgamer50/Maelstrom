@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
         test_filter_basic();
         test_filter_advanced();
     } catch(std::exception& err) {
+        std::cerr << "FAIL!" << std::endl;
         std::cerr << err.what() << std::endl;
         exit(EXIT_FAILURE);
     }

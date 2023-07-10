@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
         test_search_sorted_device();
         test_search_sorted_host();
     } catch(std::exception& err) {
+        std::cerr << "FAIL!" << std::endl;
         std::cerr << err.what() << std::endl;
         exit(EXIT_FAILURE);
     }

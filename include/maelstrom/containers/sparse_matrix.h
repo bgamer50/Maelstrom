@@ -129,6 +129,11 @@ namespace maelstrom {
             virtual void to_csr() = 0;
             virtual void to_csc() = 0;
             virtual void to_coo() = 0;
+
+            virtual maelstrom::vector get_row() = 0;
+            virtual maelstrom::vector get_col() = 0;
+            virtual maelstrom::vector get_val() = 0;
+            virtual maelstrom::vector get_rel() = 0;
     };
 
     class basic_sparse_matrix: public sparse_matrix {
@@ -146,7 +151,17 @@ namespace maelstrom {
             bool sorted;
         
         public:
-            basic_sparse_matrix(maelstrom::vector row, maelstrom::vector col, maelstrom::vector values, maelstrom::vector relations, maelstrom::sparse_matrix_format format);
+            inline basic_sparse_matrix(maelstrom::vector rows, maelstrom::vector cols, maelstrom::vector values, maelstrom::vector relations, maelstrom::sparse_matrix_format fmt, size_t num_rows, size_t num_cols, bool sorted=false) {
+                this->row = std::move(rows);
+                this->col = std::move(cols);
+                this->val = std::move(values);
+                this->rel = std::move(relations);
+
+                this->n_rows = num_rows;
+                this->n_cols = num_cols;
+                this->format = fmt;
+                this->sorted = sorted;
+            }
 
             using sparse_matrix::has_values;
             inline virtual bool has_values() {
@@ -225,6 +240,18 @@ namespace maelstrom {
 
             using sparse_matrix::to_coo;
             virtual void to_coo();
+
+            using sparse_matrix::get_row;
+            inline virtual maelstrom::vector get_row() { return this->row; }
+            
+            using sparse_matrix::get_col;
+            inline virtual maelstrom::vector get_col() { return this->col; }
+
+            using sparse_matrix::get_val;
+            inline virtual maelstrom::vector get_val() { return this->val; }
+
+            using sparse_matrix::get_rel;
+            inline virtual maelstrom::vector get_rel() { return this->rel; }
     };
 
 }

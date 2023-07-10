@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
         test_compare_basic();
         test_compare_select();
     } catch(std::exception& err) {
+        std::cerr << "FAIL!" << std::endl;
         std::cerr << err.what() << std::endl;
         exit(EXIT_FAILURE);
     }

@@ -68,7 +68,7 @@ namespace maelstrom {
                 case INT64:
                     return launch_search_sorted_sparse_device<E, int64_t>(exec_policy, row, col, ix_r, ix_c, index_not_found);
                 case INT32:
-                    return launch_search_sorted_sparse_device<E, uint8_t>(exec_policy, row, col, ix_r, ix_c, index_not_found);
+                    return launch_search_sorted_sparse_device<E, int32_t>(exec_policy, row, col, ix_r, ix_c, index_not_found);
             }
 
             throw std::runtime_error("Unsupporte data type for index in search_sorted_sparse_device");

@@ -8,11 +8,14 @@
 using namespace maelstrom::test;
 
 void test_sort_basic();
+void test_sort_multi();
 
 int main(int argc, char* argv[]) {
     try {
         test_sort_basic();
+        test_sort_multi();
     } catch(std::exception& err) {
+        std::cerr << "FAIL!" << std::endl;
         std::cerr << err.what() << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -42,4 +45,57 @@ void test_sort_basic() {
     assert( sorted_ix.size() == cpp_sorted_ix.size() );
     assert( sorted_ix.get_dtype() == maelstrom::uint64 );
     assert_array_equals(static_cast<size_t*>(sorted_ix.data()), cpp_sorted_ix.data(), cpp_sorted_ix.size());
+}
+
+void test_sort_multi() {
+    std::vector<double> a0 = {1.1, 2.1, 3.1, 1.1, 2.1, 2.1, 3.1, 2.1};
+    std::vector<double> a1 = {5.5, 6.5, 7.5, 8.5, 9.5, 3.2, 7.5, 3.2};
+    std::vector<double> a2 = {3.3, 3.3, 3.5, 4.3, 4.5, 1.2, 3.5, 8.6};
+    std::vector<double> a3 = {1.1, 2.1, 3.1, 4.1, 5.6, 6.1, 2.1, 4.1};
+
+    maelstrom::vector m_array_0(
+        maelstrom::storage::MANAGED,
+        maelstrom::float64,
+        a0.data(),
+        a0.size(),
+        false
+    );
+    maelstrom::vector m_array_1(
+        maelstrom::storage::MANAGED,
+        maelstrom::float64,
+        a1.data(),
+        a1.size(),
+        false
+    );
+    maelstrom::vector m_array_2(
+        maelstrom::storage::MANAGED,
+        maelstrom::float64,
+        a2.data(),
+        a2.size(),
+        false
+    );
+    maelstrom::vector m_array_3(
+        maelstrom::storage::MANAGED,
+        maelstrom::float64,
+        a3.data(),
+        a3.size(),
+        false
+    );
+
+    auto ix = maelstrom::sort({
+        std::ref(m_array_0),
+        std::ref(m_array_1),
+        std::ref(m_array_2),
+        std::ref(m_array_3)
+    });
+
+    std::vector<double> expected_0 = {1.1, 1.1, 2.1, 2.1, 2.1, 2.1, 3.1, 3.1};
+    std::vector<double> expected_1 = {5.5, 8.5, 3.2, 3.2, 6.5, 9.5, 7.5, 7.5};
+    std::vector<double> expected_2 = {3.3, 4.3, 1.2, 8.6, 3.3, 4.5, 3.5, 3.5};
+    std::vector<double> expected_3 = {1.1, 4.1, 6.1, 4.1, 2.1, 5.6, 2.1, 3.1};
+
+    assert_array_equals(static_cast<double*>(m_array_0.data()), expected_0.data(), expected_0.size());
+    assert_array_equals(static_cast<double*>(m_array_1.data()), expected_1.data(), expected_1.size());
+    assert_array_equals(static_cast<double*>(m_array_2.data()), expected_2.data(), expected_2.size());
+    assert_array_equals(static_cast<double*>(m_array_3.data()), expected_3.data(), expected_3.size());
 }

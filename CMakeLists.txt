@@ -28,10 +28,13 @@ add_library(
     algorithms/impl/host/search_sorted_host.cpp
     algorithms/impl/host/query_adjacency_host.cpp
     algorithms/impl/host/search_sorted_sparse_host.cpp
+    algorithms/impl/host/csr_to_coo_host.cpp
 
     # thrust/cuda
     containers/impl/thrust/vector_malloc.cu
     containers/impl/thrust/vector_access.cu
+    containers/impl/thrust/basic_sparse_matrix_convert.cu
+    containers/impl/thrust/basic_sparse_matrix_query.cu
     algorithms/impl/thrust/remove_if.cu
     algorithms/impl/thrust/increment.cu
     algorithms/impl/thrust/select.cu
@@ -50,9 +53,12 @@ add_library(
     algorithms/impl/thrust/search_sorted.cu
     algorithms/impl/thrust/search_sorted_sparse.cu
     algorithms/impl/thrust/query_adjacency.cu
+    algorithms/impl/thrust/csr_to_coo.cu
+    algorithms/impl/thrust/prefix_sum.cu
     algorithms/impl/cuda/search_sorted_device.cu
     algorithms/impl/cuda/query_adjacency_device.cu
     algorithms/impl/cuda/search_sorted_sparse_device.cu
+    algorithms/impl/cuda/csr_to_coo_device.cu
 )
 
 target_compile_options(
@@ -115,3 +121,6 @@ AddMaelstromTest(test_intersection.exe tests/test_intersection.cpp)
 AddMaelstromTest(test_search_sorted.exe tests/test_search_sorted.cpp)
 AddMaelstromTest(test_search_sorted_sparse.exe tests/test_search_sorted_sparse.cpp)
 AddMaelstromTest(test_query_adjacency.exe tests/test_query_adjacency.cpp)
+AddMaelstromTest(test_sparse_matrix.exe tests/test_sparse_matrix.cpp)
+AddMaelstromTest(test_csr_to_coo.exe tests/test_csr_to_coo.cpp)
+AddMaelstromTest(test_prefix_sum.exe tests/test_prefix_sum.cpp)
