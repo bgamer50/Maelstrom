@@ -21,3 +21,5 @@ CMakeCache.txt
 *.ninja
 .vscode/
 bin/
+_deps/
+rapids-cmake/
