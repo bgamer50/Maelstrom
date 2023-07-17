@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.23.1)
 
 project(
     MAELSTROM
@@ -8,7 +8,7 @@ project(
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CUDA_FLAGS --expt-relaxed-constexpr)
+set(CMAKE_CUDA_FLAGS "--expt-relaxed-constexpr --expt-extended-lambda")
 
 # set(CMAKE_CUDA_ARCHITECTURES "61;62;70;75;86")
 set(CMAKE_CUDA_ARCHITECTURES "61")
@@ -23,6 +23,7 @@ add_library(
     containers/impl/common/vector_construct.cpp
     containers/impl/common/vector_modify.cpp
     containers/impl/common/vector_math.cpp
+    containers/impl/common/hash_table.cpp
     storage/datatype.cpp
     algorithms/impl/common/unpack.cpp
     algorithms/impl/host/search_sorted_host.cpp
@@ -35,6 +36,16 @@ add_library(
     containers/impl/thrust/vector_access.cu
     containers/impl/thrust/basic_sparse_matrix_convert.cu
     containers/impl/thrust/basic_sparse_matrix_query.cu
+    containers/impl/cuco/hash_construct_cuco.cu
+    containers/impl/cuco/hash_destroy_cuco.cu
+    containers/impl/cuco/hash_insert_cuco.cu
+    containers/impl/cuco/hash_get_cuco.cu
+    containers/impl/cuco/hash_remove_cuco.cu
+    containers/impl/host/hash_construct_host.cu
+    containers/impl/host/hash_destroy_host.cu
+    containers/impl/host/hash_insert_host.cu
+    containers/impl/host/hash_get_host.cu
+    containers/impl/host/hash_remove_host.cu
     algorithms/impl/thrust/remove_if.cu
     algorithms/impl/thrust/increment.cu
     algorithms/impl/thrust/select.cu
@@ -61,6 +72,18 @@ add_library(
     algorithms/impl/cuda/csr_to_coo_device.cu
 )
 
+include(CPM.cmake)
+
+CPMAddPackage(
+  NAME cuco
+  GITHUB_REPOSITORY bgamer50/cuCollections
+  GIT_TAG fix-dynamic-map-alloc
+  OPTIONS
+     "BUILD_TESTS OFF"
+     "BUILD_BENCHMARKS OFF"
+     "BUILD_EXAMPLES OFF"
+)
+
 target_compile_options(
     maelstrom
     PUBLIC
@@ -75,6 +98,11 @@ target_include_directories(
     maelstrom
     PUBLIC
         "/mnt/maelstrom/include" # maelstrom path
+)
+
+target_link_libraries(
+    maelstrom
+        cuco
 )
 
 function(AddMaelstromTest EXEC_NAME)

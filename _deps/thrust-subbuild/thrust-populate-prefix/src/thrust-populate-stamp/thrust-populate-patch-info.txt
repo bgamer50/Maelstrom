@@ -1,0 +1,6 @@
+# This is a generated file and its contents are an internal implementation detail.
+# The update step will be re-executed if anything in this file changes.
+# No other meaning or use of this file is supported.
+
+command=/mnt/cmake-3.27.0-rc5-linux-x86_64/bin/cmake;-P;/mnt/maelstrom/rapids-cmake/patches/Thrust/patch.cmake
+work_dir=/mnt/maelstrom/_deps/thrust-src

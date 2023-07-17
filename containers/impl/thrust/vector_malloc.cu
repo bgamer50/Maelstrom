@@ -17,7 +17,7 @@ namespace maelstrom {
                 cudaMallocManaged(&ptr, dtype_size * N);
                 cudaMemAdvise(ptr, dtype_size * N, cudaMemAdviseSetPreferredLocation, cudaCpuDeviceId);
                 cudaDeviceSynchronize();
-                maelstrom::cuda::cudaCheckErrors("vector alloc device memory");
+                maelstrom::cuda::cudaCheckErrors("vector alloc host memory");
                 return ptr;
             }
             case DEVICE: {
