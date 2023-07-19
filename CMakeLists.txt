@@ -97,7 +97,7 @@ target_compile_options(
 target_include_directories(
     maelstrom
     PUBLIC
-        "/mnt/maelstrom/include" # maelstrom path
+        "include/" # maelstrom path
 )
 
 target_link_libraries(
@@ -118,7 +118,7 @@ function(AddMaelstromTest EXEC_NAME)
     target_include_directories(
         ${EXEC_NAME}
         PRIVATE
-            "/mnt/maelstrom/tests"
+            "tests/"
     )
 
     target_link_libraries(
@@ -137,7 +137,7 @@ AddMaelstromTest(test_select.exe tests/test_select.cpp)
 AddMaelstromTest(test_unpack.exe tests/test_unpack.cpp)
 AddMaelstromTest(test_filter.exe tests/test_filter.cpp)
 AddMaelstromTest(test_compare.exe tests/test_compare.cpp)
-AddMaelstromtest(test_sort.exe tests/test_sort.cpp)
+AddMaelstromTest(test_sort.exe tests/test_sort.cpp)
 AddMaelstromTest(test_unique.exe tests/test_unique.cpp)
 AddMaelstromTest(test_count_unique.exe tests/test_count_unique.cpp)
 AddMaelstromTest(test_reduce.exe tests/test_reduce.cpp)
