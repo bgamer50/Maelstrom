@@ -2,7 +2,7 @@
 #include "maelstrom/algorithms/select.h"
 #include "maelstrom/algorithms/sort.h"
 #include "maelstrom/thrust_utils/thrust_utils.cuh"
-#include <boost/any.hpp>
+#include <any>
 
 namespace maelstrom {
 
@@ -59,17 +59,17 @@ namespace maelstrom {
     }
 
     maelstrom::vector unique_from_sorted_vec_dispatch_exec_policy(maelstrom::vector& vec) {
-        boost::any exec_policy = maelstrom::get_execution_policy(vec).get();
+        std::any exec_policy = maelstrom::get_execution_policy(vec).get();
         const std::type_info& t = exec_policy.type();
         
         if(typeid(device_exec_t) == t) {
             return unique_from_sorted_vec_dispatch_val(
-                boost::any_cast<device_exec_t>(exec_policy),
+                std::any_cast<device_exec_t>(exec_policy),
                 vec
             );
         } else if(typeid(host_exec_t) == t) {
             return unique_from_sorted_vec_dispatch_val(
-                boost::any_cast<host_exec_t>(exec_policy),
+                std::any_cast<host_exec_t>(exec_policy),
                 vec
             );
         }

@@ -98,7 +98,7 @@ namespace maelstrom {
             */
             virtual std::pair<maelstrom::vector, maelstrom::vector> get_relations_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) = 0;
 
-            virtual maelstrom::vector get_1d_index_from_2d_index(maelstrom::vector& ix_r, maelstrom::vector& ix_c, boost::any index_not_found=boost::any()) = 0;
+            virtual maelstrom::vector get_1d_index_from_2d_index(maelstrom::vector& ix_r, maelstrom::vector& ix_c, std::any index_not_found=std::any()) = 0;
 
             /*
                 Depending on the format of this matrix, this operation is slightly different.
@@ -224,7 +224,7 @@ namespace maelstrom {
             virtual std::pair<maelstrom::vector, maelstrom::vector> get_relations_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c);
 
             using sparse_matrix::get_1d_index_from_2d_index;
-            virtual maelstrom::vector get_1d_index_from_2d_index(maelstrom::vector& ix_r, maelstrom::vector& ix_c, boost::any index_not_found=boost::any());
+            virtual maelstrom::vector get_1d_index_from_2d_index(maelstrom::vector& ix_r, maelstrom::vector& ix_c, std::any index_not_found=std::any());
 
             using sparse_matrix::query_adjacency;
             virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix, maelstrom::vector& rel_types, bool return_inner=true, bool return_values=false, bool return_relations=false);

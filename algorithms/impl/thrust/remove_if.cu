@@ -2,7 +2,7 @@
 #include "maelstrom/thrust_utils/thrust_utils.cuh"
 #include "maelstrom/thrust_utils/execution.cuh"
 
-#include <boost/any.hpp>
+#include <any>
 #include <sstream>
 
 namespace maelstrom {
@@ -131,18 +131,18 @@ namespace maelstrom {
             throw std::runtime_error(sx.str());
         }
 
-        boost::any exec_policy = maelstrom::get_execution_policy(array).get();
+        std::any exec_policy = maelstrom::get_execution_policy(array).get();
         const std::type_info& t = exec_policy.type();
         
         if(typeid(device_exec_t) == t) {
             return remove_if_dispatch_outer(
-                boost::any_cast<device_exec_t>(exec_policy),
+                std::any_cast<device_exec_t>(exec_policy),
                 array,
                 stencil
             );
         } else if(typeid(host_exec_t) == t) {
             return remove_if_dispatch_outer(
-                boost::any_cast<host_exec_t>(exec_policy),
+                std::any_cast<host_exec_t>(exec_policy),
                 array,
                 stencil
             );

@@ -7,7 +7,7 @@
 namespace maelstrom {
 
     template <typename E, typename T>
-    maelstrom::vector t_filter(E exec_policy, maelstrom::vector& vec, maelstrom::comparator cmp, boost::any cmp_val) {
+    maelstrom::vector t_filter(E exec_policy, maelstrom::vector& vec, maelstrom::comparator cmp, std::any cmp_val) {
         maelstrom::vector indices(
             vec.get_mem_type(),
             maelstrom::uint64,
@@ -28,7 +28,7 @@ namespace maelstrom {
             thrust::make_counting_iterator<size_t>(0) + vec.size(),
             maelstrom::device_tptr_cast<T>(vec.data()),
             maelstrom::device_tptr_cast<size_t>(indices.data()),
-            maelstrom::filter_fn<T>{boost::any_cast<T>(cmp_val), cmp}
+            maelstrom::filter_fn<T>{std::any_cast<T>(cmp_val), cmp}
         );
 
         indices.resize(
@@ -39,7 +39,7 @@ namespace maelstrom {
     }
 
     template <typename E>
-    maelstrom::vector filter_dispatch_val(E exec_policy, maelstrom::vector& vec, maelstrom::comparator cmp, boost::any cmp_val) {
+    maelstrom::vector filter_dispatch_val(E exec_policy, maelstrom::vector& vec, maelstrom::comparator cmp, std::any cmp_val) {
         switch(vec.get_dtype().prim_type) {
             case UINT64:
                 return t_filter<E, uint64_t>(exec_policy, vec, cmp, cmp_val);
@@ -62,20 +62,20 @@ namespace maelstrom {
         throw std::runtime_error("Invalid dtype provided to filter()");
     }
 
-    maelstrom::vector filter_dispatch_exec_policy(maelstrom::vector& vec, maelstrom::comparator cmp, boost::any cmp_val) {
-        boost::any exec_policy = maelstrom::get_execution_policy(vec).get();
+    maelstrom::vector filter_dispatch_exec_policy(maelstrom::vector& vec, maelstrom::comparator cmp, std::any cmp_val) {
+        std::any exec_policy = maelstrom::get_execution_policy(vec).get();
         const std::type_info& t = exec_policy.type();
         
         if(typeid(device_exec_t) == t) {
             return filter_dispatch_val(
-                boost::any_cast<device_exec_t>(exec_policy),
+                std::any_cast<device_exec_t>(exec_policy),
                 vec,
                 cmp,
                 cmp_val
             );
         } else if(typeid(host_exec_t) == t) {
             return filter_dispatch_val(
-                boost::any_cast<host_exec_t>(exec_policy),
+                std::any_cast<host_exec_t>(exec_policy),
                 vec,
                 cmp,
                 cmp_val
@@ -85,7 +85,7 @@ namespace maelstrom {
         throw std::runtime_error("Invalid execution policy for filter");
     }
 
-    maelstrom::vector filter(maelstrom::vector& vec, maelstrom::comparator cmp, boost::any cmp_val) {
+    maelstrom::vector filter(maelstrom::vector& vec, maelstrom::comparator cmp, std::any cmp_val) {
         return filter_dispatch_exec_policy(vec, cmp, cmp_val);
     }
 

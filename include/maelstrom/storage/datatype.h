@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/any.hpp>
+#include <any>
 #include <functional>
 #include <string>
 
@@ -10,8 +10,8 @@ namespace maelstrom {
     struct dtype_t {
         std::string name;
         primitive_t prim_type;
-        std::function<boost::any(void* data)> deserialize;
-        std::function<boost::any(boost::any)> serialize = [](boost::any a){return a;};
+        std::function<std::any(void* data)> deserialize;
+        std::function<std::any(std::any)> serialize = [](std::any a){return a;};
 
         bool operator==(const dtype_t& other);
         bool operator!=(const dtype_t& other);
@@ -21,13 +21,13 @@ namespace maelstrom {
 
     inline size_t size_of(dtype_t& dtype) { return size_of(dtype.prim_type); }
 
-    primitive_t prim_type_of(boost::any& a);
+    primitive_t prim_type_of(std::any& a);
 
     dtype_t dtype_from_prim_type(primitive_t prim_type);
 
-    std::pair<std::vector<unsigned char>, primitive_t> any_to_bytes(boost::any& a);
+    std::pair<std::vector<unsigned char>, primitive_t> any_to_bytes(std::any& a);
 
-    boost::any max_value(maelstrom::dtype_t& dtype);
+    std::any max_value(maelstrom::dtype_t& dtype);
 
     extern dtype_t uint64;
     extern dtype_t uint32;

@@ -79,18 +79,18 @@ namespace maelstrom {
             throw std::runtime_error(sx.str());
         }
 
-        boost::any exec_policy = maelstrom::get_execution_policy(vec).get();
+        std::any exec_policy = maelstrom::get_execution_policy(vec).get();
         const std::type_info& t = exec_policy.type();
         
         if(typeid(device_exec_t) == t) {
             return select_dispatch_outer(
-                boost::any_cast<device_exec_t>(exec_policy),
+                std::any_cast<device_exec_t>(exec_policy),
                 vec,
                 idx
             );
         } else if(typeid(host_exec_t) == t) {
             return select_dispatch_outer(
-                boost::any_cast<host_exec_t>(exec_policy),
+                std::any_cast<host_exec_t>(exec_policy),
                 vec,
                 idx
             );

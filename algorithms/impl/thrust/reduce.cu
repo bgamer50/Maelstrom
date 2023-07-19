@@ -5,7 +5,7 @@
 namespace maelstrom {
 
     template<typename E, typename T>
-    std::pair<boost::any, size_t> t_reduce(E exec_policy, maelstrom::vector& vec, maelstrom::reductor red) {
+    std::pair<std::any, size_t> t_reduce(E exec_policy, maelstrom::vector& vec, maelstrom::reductor red) {
         auto zip = thrust::make_zip_iterator(
             thrust::make_tuple(
                 maelstrom::device_tptr_cast<T>(vec.data()),
@@ -24,7 +24,7 @@ namespace maelstrom {
                 );
 
                 return std::make_pair(
-                    boost::any(thrust::get<0>(t)),
+                    std::any(thrust::get<0>(t)),
                     thrust::get<1>(t)
                 );
             }
@@ -38,7 +38,7 @@ namespace maelstrom {
                 );
 
                 return std::make_pair(
-                    boost::any(thrust::get<0>(t)),
+                    std::any(thrust::get<0>(t)),
                     thrust::get<1>(t)
                 );
             }
@@ -52,7 +52,7 @@ namespace maelstrom {
                 );
 
                 return std::make_pair(
-                    boost::any(thrust::get<0>(t)),
+                    std::any(thrust::get<0>(t)),
                     thrust::get<1>(t)
                 );
             }
@@ -66,7 +66,7 @@ namespace maelstrom {
                 );
 
                 return std::make_pair(
-                    boost::any(thrust::get<0>(t)),
+                    std::any(thrust::get<0>(t)),
                     thrust::get<1>(t)
                 );
             }
@@ -93,7 +93,7 @@ namespace maelstrom {
     }
 
     template<typename E>
-    std::pair<boost::any, size_t> reduce_dispatch_val(E exec_policy, maelstrom::vector& vec, maelstrom::reductor red) {
+    std::pair<std::any, size_t> reduce_dispatch_val(E exec_policy, maelstrom::vector& vec, maelstrom::reductor red) {
         switch(vec.get_dtype().prim_type) {
             case UINT64:
                 return t_reduce<E, uint64_t>(exec_policy, vec, red);
@@ -116,19 +116,19 @@ namespace maelstrom {
         throw std::runtime_error("invalid primitive type provided to reduce");
     }
 
-    std::pair<boost::any, size_t> reduce_dispatch_exec_policy(maelstrom::vector& vec, maelstrom::reductor red) {
-        boost::any exec_policy = maelstrom::get_execution_policy(vec).get();
+    std::pair<std::any, size_t> reduce_dispatch_exec_policy(maelstrom::vector& vec, maelstrom::reductor red) {
+        std::any exec_policy = maelstrom::get_execution_policy(vec).get();
         const std::type_info& t = exec_policy.type();
         
         if(typeid(device_exec_t) == t) {
             return reduce_dispatch_val(
-                boost::any_cast<device_exec_t>(exec_policy),
+                std::any_cast<device_exec_t>(exec_policy),
                 vec,
                 red
             );
         } else if(typeid(host_exec_t) == t) {
             return reduce_dispatch_val(
-                boost::any_cast<host_exec_t>(exec_policy),
+                std::any_cast<host_exec_t>(exec_policy),
                 vec,
                 red
             );
@@ -137,7 +137,7 @@ namespace maelstrom {
         throw std::runtime_error("Invalid execution policy for increment");
     }
 
-    std::pair<boost::any, size_t> reduce(maelstrom::vector& vec, maelstrom::reductor red) {
+    std::pair<std::any, size_t> reduce(maelstrom::vector& vec, maelstrom::reductor red) {
         if(vec.size() == 0) {
             throw std::runtime_error("Attempting to reduce an empty vector!");
         }

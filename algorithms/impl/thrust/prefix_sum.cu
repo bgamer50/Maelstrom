@@ -36,17 +36,17 @@ namespace maelstrom {
     }
 
     void prefix_sum_dispatch_exec_policy(maelstrom::vector& vec) {
-        boost::any exec_policy = maelstrom::get_execution_policy(vec).get();
+        std::any exec_policy = maelstrom::get_execution_policy(vec).get();
         const std::type_info& t = exec_policy.type();
         
         if(typeid(device_exec_t) == t) {
             return prefix_sum_dispatch_val(
-                boost::any_cast<device_exec_t>(exec_policy),
+                std::any_cast<device_exec_t>(exec_policy),
                 vec
             );
         } else if(typeid(host_exec_t) == t) {
             return prefix_sum_dispatch_val(
-                boost::any_cast<host_exec_t>(exec_policy),
+                std::any_cast<host_exec_t>(exec_policy),
                 vec
             );
         }

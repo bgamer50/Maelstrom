@@ -32,7 +32,7 @@ namespace maelstrom {
         }
 
         template <typename T>
-        maelstrom::vector launch_search_sorted_sparse_host(maelstrom::vector& row, maelstrom::vector& col, maelstrom::vector& ix_r, maelstrom::vector& ix_c, boost::any index_not_found) {
+        maelstrom::vector launch_search_sorted_sparse_host(maelstrom::vector& row, maelstrom::vector& col, maelstrom::vector& ix_r, maelstrom::vector& ix_c, std::any index_not_found) {
             maelstrom::vector output_ix(row.get_mem_type(), row.get_dtype(), ix_r.size());
 
             h_search_sorted_sparse(
@@ -42,13 +42,13 @@ namespace maelstrom {
                 static_cast<T*>(ix_c.data()),
                 static_cast<T*>(output_ix.data()),
                 ix_r.size(),
-                index_not_found.empty() ? std::numeric_limits<T>::max() : boost::any_cast<T>(maelstrom::safe_any_cast(index_not_found, ix_r.get_dtype()))
+                (!index_not_found.has_value()) ? std::numeric_limits<T>::max() : std::any_cast<T>(maelstrom::safe_any_cast(index_not_found, ix_r.get_dtype()))
             );
 
             return output_ix;
         }
 
-        maelstrom::vector search_sorted_sparse_host_dispatch_ix(maelstrom::vector& row, maelstrom::vector& col, maelstrom::vector& ix_r, maelstrom::vector& ix_c, boost::any index_not_found) {
+        maelstrom::vector search_sorted_sparse_host_dispatch_ix(maelstrom::vector& row, maelstrom::vector& col, maelstrom::vector& ix_r, maelstrom::vector& ix_c, std::any index_not_found) {
             switch(row.get_dtype().prim_type) {
                 case UINT64:
                     return launch_search_sorted_sparse_host<uint64_t>(row, col, ix_r, ix_c, index_not_found);

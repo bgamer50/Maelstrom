@@ -35,7 +35,7 @@ namespace maelstrom {
         }
 
         template <typename E, typename T>
-        maelstrom::vector launch_search_sorted_sparse_device(E exec_policy, maelstrom::vector& row, maelstrom::vector& col, maelstrom::vector& ix_r, maelstrom::vector& ix_c, boost::any index_not_found) {
+        maelstrom::vector launch_search_sorted_sparse_device(E exec_policy, maelstrom::vector& row, maelstrom::vector& col, maelstrom::vector& ix_r, maelstrom::vector& ix_c, std::any index_not_found) {
             const size_t sz = ix_r.size();
             const size_t num_blocks = maelstrom::cuda::num_blocks(sz, MAELSTROM_DEFAULT_BLOCK_SIZE);
             
@@ -48,7 +48,7 @@ namespace maelstrom {
                 static_cast<T*>(ix_c.data()),
                 static_cast<T*>(output_ix.data()),
                 sz,
-                index_not_found.empty() ? std::numeric_limits<T>::max() : boost::any_cast<T>(maelstrom::safe_any_cast(index_not_found, ix_r.get_dtype()))
+                (!index_not_found.has_value()) ? std::numeric_limits<T>::max() : std::any_cast<T>(maelstrom::safe_any_cast(index_not_found, ix_r.get_dtype()))
             );
             cudaDeviceSynchronize();
             maelstrom::cuda::cudaCheckErrors("k_search_sorted_sparse");
@@ -57,7 +57,7 @@ namespace maelstrom {
         }
 
         template <typename E>
-        maelstrom::vector search_sorted_sparse_device_dispatch_ix(E exec_policy, maelstrom::vector& row, maelstrom::vector& col, maelstrom::vector& ix_r, maelstrom::vector& ix_c, boost::any index_not_found) {
+        maelstrom::vector search_sorted_sparse_device_dispatch_ix(E exec_policy, maelstrom::vector& row, maelstrom::vector& col, maelstrom::vector& ix_r, maelstrom::vector& ix_c, std::any index_not_found) {
             switch(row.get_dtype().prim_type) {
                 case UINT64:
                     return launch_search_sorted_sparse_device<E, uint64_t>(exec_policy, row, col, ix_r, ix_c, index_not_found);
@@ -75,7 +75,7 @@ namespace maelstrom {
         }
 
         template
-        maelstrom::vector search_sorted_sparse_device_dispatch_ix(maelstrom::device_exec_t exec_policy, maelstrom::vector& row, maelstrom::vector& col, maelstrom::vector& ix_r, maelstrom::vector& ix_c, boost::any index_not_found);
+        maelstrom::vector search_sorted_sparse_device_dispatch_ix(maelstrom::device_exec_t exec_policy, maelstrom::vector& row, maelstrom::vector& col, maelstrom::vector& ix_r, maelstrom::vector& ix_c, std::any index_not_found);
 
     }
 }
