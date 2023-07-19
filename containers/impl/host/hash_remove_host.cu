@@ -54,7 +54,7 @@ namespace maelstrom {
     }
 
     template<>
-    void remove_hash_table<DEVICE>(void* data, maelstrom::vector& keys, maelstrom::dtype_t value_dtype) {
+    void remove_hash_table<HOST>(void* data, maelstrom::vector& keys, maelstrom::dtype_t value_dtype) {
         return remove_hash_table_host_dispatch_key(data, keys, value_dtype);
     }
 
