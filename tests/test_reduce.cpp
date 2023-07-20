@@ -34,11 +34,11 @@ void test_reduce_basic() {
         false
     );
 
-    assert( boost::any_cast<int>(maelstrom::reduce(m_array, maelstrom::reductor::MIN).first) == 0);
-    assert( boost::any_cast<int>(maelstrom::reduce(m_array, maelstrom::reductor::MAX).first) == 7);
-    assert( boost::any_cast<int>(maelstrom::reduce(m_array, maelstrom::reductor::SUM).first) == 28);
-    assert( boost::any_cast<int>(maelstrom::reduce(m_array, maelstrom::reductor::PRODUCT).first) == 0);
-    assert( boost::any_cast<double>(maelstrom::reduce(m_array, maelstrom::reductor::MEAN).first) - 3.5 <= 0.001);
+    assert( std::any_cast<int>(maelstrom::reduce(m_array, maelstrom::reductor::MIN).first) == 0);
+    assert( std::any_cast<int>(maelstrom::reduce(m_array, maelstrom::reductor::MAX).first) == 7);
+    assert( std::any_cast<int>(maelstrom::reduce(m_array, maelstrom::reductor::SUM).first) == 28);
+    assert( std::any_cast<int>(maelstrom::reduce(m_array, maelstrom::reductor::PRODUCT).first) == 0);
+    assert( std::any_cast<double>(maelstrom::reduce(m_array, maelstrom::reductor::MEAN).first) - 3.5 <= 0.001);
 }
 
 void test_reduce_ix() {
@@ -52,16 +52,16 @@ void test_reduce_ix() {
         false
     );
 
-    boost::any val;
+    std::any val;
     size_t ix;
     std::tie(val, ix) = maelstrom::reduce(m_array, maelstrom::reductor::MIN);
 
-    assert( boost::any_cast<double>(val) == -3.3 );
+    assert( std::any_cast<double>(val) == -3.3 );
     assert( ix ==  7);
     
     std::tie(val, ix) = maelstrom::reduce(m_array, maelstrom::reductor::MAX);
 
-    assert( boost::any_cast<double>(val) == 9.4 );
+    assert( std::any_cast<double>(val) == 9.4 );
     assert( ix ==  8);
 
     // sum, mean, product have no index guarantee

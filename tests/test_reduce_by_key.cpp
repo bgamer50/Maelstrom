@@ -67,16 +67,16 @@ void test_reduce_basic() {
     std::vector<uint8_t> expected_values = {(uint8_t)17, (uint8_t)22, (uint8_t)3, (uint8_t)20};
     assert_array_equals(static_cast<uint8_t*>(output_values.data()), expected_values.data(), expected_values.size());
 
-    uint64_t i0 = boost::any_cast<uint64_t>(output_indices.get(0));
+    uint64_t i0 = std::any_cast<uint64_t>(output_indices.get(0));
     assert(i0  == 0 || i0 == 4 || i0 == 6 );
 
-    uint64_t i1 = boost::any_cast<uint64_t>(output_indices.get(1));
+    uint64_t i1 = std::any_cast<uint64_t>(output_indices.get(1));
     assert(i1  == 1 || i1 == 7 );
 
-    uint64_t i2 = boost::any_cast<uint64_t>(output_indices.get(2));
+    uint64_t i2 = std::any_cast<uint64_t>(output_indices.get(2));
     assert(i2 == 2 );
 
-    uint64_t i3 = boost::any_cast<uint64_t>(output_indices.get(3));
+    uint64_t i3 = std::any_cast<uint64_t>(output_indices.get(3));
     assert(i3 == 3 || i3 == 5 );
 
     // Testing MIN
@@ -168,16 +168,16 @@ void test_reduce_mean() {
     std::vector<double> expected_values = {17.0/3.0, 22.0/2.0, 3.0/1.0, 20.0/2.0};
     assert_array_equals(static_cast<double*>(output_values.data()), expected_values.data(), expected_values.size());
 
-    uint64_t i0 = boost::any_cast<uint64_t>(output_indices.get(0));
+    uint64_t i0 = std::any_cast<uint64_t>(output_indices.get(0));
     assert(i0  == 0 || i0 == 4 || i0 == 6 );
 
-    uint64_t i1 = boost::any_cast<uint64_t>(output_indices.get(1));
+    uint64_t i1 = std::any_cast<uint64_t>(output_indices.get(1));
     assert(i1  == 1 || i1 == 7 );
 
-    uint64_t i2 = boost::any_cast<uint64_t>(output_indices.get(2));
+    uint64_t i2 = std::any_cast<uint64_t>(output_indices.get(2));
     assert(i2 == 2 );
 
-    uint64_t i3 = boost::any_cast<uint64_t>(output_indices.get(3));
+    uint64_t i3 = std::any_cast<uint64_t>(output_indices.get(3));
     assert(i3 == 3 || i3 == 5 );
 
 }

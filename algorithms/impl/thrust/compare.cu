@@ -97,12 +97,12 @@ namespace maelstrom {
     }
 
     maelstrom::vector compare_dispatch_exec_policy(maelstrom::vector& vec1, maelstrom::vector& vec2, maelstrom::comparator cmp, bool invert) {
-        boost::any exec_policy = maelstrom::get_execution_policy(vec1).get();
+        std::any exec_policy = maelstrom::get_execution_policy(vec1).get();
         const std::type_info& t = exec_policy.type();
         
         if(typeid(device_exec_t) == t) {
             return compare_dispatch_val(
-                boost::any_cast<device_exec_t>(exec_policy),
+                std::any_cast<device_exec_t>(exec_policy),
                 vec1,
                 vec2,
                 cmp,
@@ -110,7 +110,7 @@ namespace maelstrom {
             );
         } else if(typeid(host_exec_t) == t) {
             return compare_dispatch_val(
-                boost::any_cast<host_exec_t>(exec_policy),
+                std::any_cast<host_exec_t>(exec_policy),
                 vec1,
                 vec2,
                 cmp,

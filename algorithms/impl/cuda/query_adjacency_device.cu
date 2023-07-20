@@ -122,7 +122,7 @@ namespace maelstrom {
                 maelstrom::device_tptr_cast<size_t>(output_memory.data())
             );
 
-            size_t output_size = boost::any_cast<size_t>(output_memory.get(output_memory.size() - 1));
+            size_t output_size = std::any_cast<size_t>(output_memory.get(output_memory.size() - 1));
 
             maelstrom::vector origin(row.get_mem_type(), uint64, output_size);
             maelstrom::vector adjacent(row.get_mem_type(), row.get_dtype(), return_inner ? output_size : 0);

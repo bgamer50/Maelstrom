@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <inttypes.h>
 #include <string>
+#include <stdexcept>
 
 #include "maelstrom/storage/storage.h"
 #include "maelstrom/storage/datatype.h"
@@ -79,7 +80,7 @@ namespace maelstrom {
             /*
                 Gets the value at the given index.
             */
-            boost::any get(size_t i);
+            std::any get(size_t i);
 
             /*
                 Empties the contents of this vector and frees any reserved memory.
@@ -189,12 +190,12 @@ namespace maelstrom {
         Makes a new vector of appropriate data type from the given vector of anys
         with the given storage type.
    */
-   maelstrom::vector make_vector_from_anys(maelstrom::storage mem_type, std::vector<boost::any>& anys);
+   maelstrom::vector make_vector_from_anys(maelstrom::storage mem_type, std::vector<std::any>& anys);
 
    /*
         Makes a new vector of the given data type from the given vector of anys
         with the given storage type.
    */
-   maelstrom::vector make_vector_from_anys(maelstrom::storage mem_type, maelstrom::dtype_t dtype, std::vector<boost::any>& anys);
+   maelstrom::vector make_vector_from_anys(maelstrom::storage mem_type, maelstrom::dtype_t dtype, std::vector<std::any>& anys);
 
 }

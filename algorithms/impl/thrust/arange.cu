@@ -5,10 +5,10 @@
 namespace maelstrom {
 
     template <typename E, typename T>
-    void t_fill_arange(E exec_policy, maelstrom::vector& vec, boost::any start, boost::any end, boost::any inc) {
-        T t_start = boost::any_cast<T>(start);
-        T t_end = boost::any_cast<T>(end);
-        T t_inc = boost::any_cast<T>(inc);
+    void t_fill_arange(E exec_policy, maelstrom::vector& vec, std::any start, std::any end, std::any inc) {
+        T t_start = std::any_cast<T>(start);
+        T t_end = std::any_cast<T>(end);
+        T t_inc = std::any_cast<T>(inc);
 
         if(t_inc <= 0) throw std::runtime_error("increment must be > 0 for arange!");
         if(t_start >= t_end) throw std::runtime_error("start must be < end for arange!");
@@ -36,18 +36,18 @@ namespace maelstrom {
     }
 
     template<typename T>
-    maelstrom::vector arange_dispatch_exec_policy(maelstrom::storage mem_type, boost::any start, boost::any end, boost::any inc) {
+    maelstrom::vector arange_dispatch_exec_policy(maelstrom::storage mem_type, std::any start, std::any end, std::any inc) {
         maelstrom::vector vec(
             mem_type,
             maelstrom::dtype_from_prim_type(maelstrom::prim_type_of(start))
         );
 
-        boost::any exec_policy = maelstrom::get_execution_policy(vec).get();
+        std::any exec_policy = maelstrom::get_execution_policy(vec).get();
         const std::type_info& t = exec_policy.type();
         
         if(typeid(device_exec_t) == t) {
             t_fill_arange<device_exec_t, T>(
-                boost::any_cast<device_exec_t>(exec_policy),
+                std::any_cast<device_exec_t>(exec_policy),
                 vec,
                 start,
                 end,
@@ -55,7 +55,7 @@ namespace maelstrom {
             );
         } else if(typeid(host_exec_t) == t) {
              t_fill_arange<host_exec_t, T>(
-                boost::any_cast<host_exec_t>(exec_policy),
+                std::any_cast<host_exec_t>(exec_policy),
                 vec,
                 start,
                 end,
@@ -68,7 +68,7 @@ namespace maelstrom {
         return vec;
     }
 
-    maelstrom::vector arange(maelstrom::storage mem_type, boost::any start, boost::any end, boost::any inc) {
+    maelstrom::vector arange(maelstrom::storage mem_type, std::any start, std::any end, std::any inc) {
         if(start.type() != end.type()) throw std::runtime_error("Start and end dtype must match in arange!");
         if(start.type() != inc.type()) throw std::runtime_error("Start dtype must match increment dtype in arange!");
 
@@ -86,11 +86,11 @@ namespace maelstrom {
     }
 
     template<typename T>
-    maelstrom::vector arange_start_end_helper(maelstrom::storage mem_type, boost::any start, boost::any end) {
+    maelstrom::vector arange_start_end_helper(maelstrom::storage mem_type, std::any start, std::any end) {
         return arange(mem_type, start, end, static_cast<T>(1));
     }
 
-    maelstrom::vector arange(maelstrom::storage mem_type, boost::any start, boost::any end) {
+    maelstrom::vector arange(maelstrom::storage mem_type, std::any start, std::any end) {
         if(start.type() != end.type()) throw std::runtime_error("Start and end dtype must match in arange!");
 
         if(start.type() == typeid(uint64_t)) return arange_start_end_helper<uint64_t>(mem_type, start, end);
@@ -107,11 +107,11 @@ namespace maelstrom {
 
 
     template <typename T>
-    maelstrom::vector arange_N_helper(maelstrom::storage mem_type, boost::any N) {
+    maelstrom::vector arange_N_helper(maelstrom::storage mem_type, std::any N) {
         return arange(mem_type, static_cast<T>(0), N);
     }
 
-    maelstrom::vector arange(maelstrom::storage mem_type, boost::any N) {
+    maelstrom::vector arange(maelstrom::storage mem_type, std::any N) {
         if(N.type() == typeid(uint64_t)) return arange_N_helper<uint64_t>(mem_type, N);
         if(N.type() == typeid(uint32_t)) return arange_N_helper<uint32_t>(mem_type, N);
         if(N.type() == typeid(uint8_t)) return arange_N_helper<uint8_t>(mem_type, N);

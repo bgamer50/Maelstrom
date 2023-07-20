@@ -5,7 +5,7 @@
 #include <thrust/system/cuda/execution_policy.h>
 
 #include <optional>
-#include <boost/any.hpp>
+#include <any>
 
 namespace maelstrom {
 
@@ -30,7 +30,7 @@ namespace maelstrom {
                 this->host_exec_policy.emplace(host_policy);
             }
 
-            boost::any get() {
+            std::any get() {
                 if(device_exec_policy) return device_exec_policy.value();
                 if(host_exec_policy) return host_exec_policy.value();
                 throw std::runtime_error("no valid exec policy!");
