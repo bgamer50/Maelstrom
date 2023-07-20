@@ -140,7 +140,7 @@ namespace maelstrom {
         return *this;
     }
 
-    vector make_vector_from_anys(maelstrom::storage mem_type, maelstrom::dtype_t dtype, std::vector<boost::any>& anys) {
+    vector make_vector_from_anys(maelstrom::storage mem_type, maelstrom::dtype_t dtype, std::vector<std::any>& anys) {
         if(anys.empty()) return maelstrom::vector(mem_type, maelstrom::default_dtype);
 
         std::vector<unsigned char> bytes;
@@ -169,7 +169,7 @@ namespace maelstrom {
         );
     }
 
-    vector make_vector_from_anys(maelstrom::storage mem_type, std::vector<boost::any>& anys) {
+    vector make_vector_from_anys(maelstrom::storage mem_type, std::vector<std::any>& anys) {
         if(anys.empty()) return maelstrom::vector(mem_type, maelstrom::default_dtype);
         maelstrom::dtype_t dtype = maelstrom::dtype_from_prim_type(
             maelstrom::prim_type_of(anys.front())

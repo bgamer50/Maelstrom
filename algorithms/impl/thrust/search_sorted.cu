@@ -9,12 +9,12 @@ namespace maelstrom {
     extern maelstrom::vector search_sorted_device_dispatch_val(E exec_policy, maelstrom::vector& sorted_array, maelstrom::vector& values_to_find);
 
     maelstrom::vector search_sorted_dispatch_exec_policy(maelstrom::vector& sorted_array, maelstrom::vector& values_to_find) {
-        boost::any exec_policy = maelstrom::get_execution_policy(sorted_array).get();
+        std::any exec_policy = maelstrom::get_execution_policy(sorted_array).get();
         const std::type_info& t = exec_policy.type();
         
         if(typeid(device_exec_t) == t) {
             return search_sorted_device_dispatch_val(
-                boost::any_cast<device_exec_t>(exec_policy),
+                std::any_cast<device_exec_t>(exec_policy),
                 sorted_array,
                 values_to_find
             );

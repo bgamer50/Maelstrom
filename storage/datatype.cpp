@@ -1,5 +1,7 @@
 #include "maelstrom/storage/datatype.h"
 #include <limits>
+#include <cstdint>
+#include <stdexcept>
 
 namespace maelstrom {
 
@@ -26,7 +28,7 @@ namespace maelstrom {
         throw std::runtime_error("Invalid type");
     }
 
-    primitive_t prim_type_of(boost::any& a) {
+    primitive_t prim_type_of(std::any& a) {
         const std::type_info& t = a.type();
         if(t == typeid(uint64_t)) return primitive_t::UINT64;
         if(t == typeid(uint32_t)) return primitive_t::UINT32;
@@ -63,42 +65,42 @@ namespace maelstrom {
         throw std::runtime_error("Invalid primitive type");
     }
 
-    std::pair<std::vector<unsigned char>, primitive_t> any_to_bytes(boost::any& a) {
+    std::pair<std::vector<unsigned char>, primitive_t> any_to_bytes(std::any& a) {
         primitive_t prim_type = prim_type_of(a);
         std::vector<unsigned char> bytes(size_of(prim_type));
         void* data = bytes.data();
 
         switch(prim_type) {
             case UINT64: {
-                *static_cast<uint64_t*>(data) = boost::any_cast<uint64_t>(a);
+                *static_cast<uint64_t*>(data) = std::any_cast<uint64_t>(a);
                 break;
             }
             case UINT32: {
-                *static_cast<uint32_t*>(data) = boost::any_cast<uint32_t>(a);
+                *static_cast<uint32_t*>(data) = std::any_cast<uint32_t>(a);
                 break;
             }
             case UINT8: {
-                *static_cast<uint8_t*>(data) = boost::any_cast<uint8_t>(a);
+                *static_cast<uint8_t*>(data) = std::any_cast<uint8_t>(a);
                 break;
             }
             case INT64: {
-                *static_cast<int64_t*>(data) = boost::any_cast<int64_t>(a);
+                *static_cast<int64_t*>(data) = std::any_cast<int64_t>(a);
                 break;
             }
             case INT32: {
-                *static_cast<int32_t*>(data) = boost::any_cast<int32_t>(a);
+                *static_cast<int32_t*>(data) = std::any_cast<int32_t>(a);
                 break;
             }
             case INT8: {
-                *static_cast<int8_t*>(data) = boost::any_cast<uint8_t>(a);
+                *static_cast<int8_t*>(data) = std::any_cast<uint8_t>(a);
                 break;
             }
             case FLOAT64: {
-                *static_cast<double*>(data) = boost::any_cast<double>(a);
+                *static_cast<double*>(data) = std::any_cast<double>(a);
                 break;
             }
             case FLOAT32: {
-                *static_cast<float*>(data) = boost::any_cast<float>(a);
+                *static_cast<float*>(data) = std::any_cast<float>(a);
                 break;
             }
             default:
@@ -108,7 +110,7 @@ namespace maelstrom {
         return std::make_pair(bytes, prim_type);
     }
 
-    boost::any max_value(dtype_t& dtype) {
+    std::any max_value(dtype_t& dtype) {
         switch(dtype.prim_type) {
             case UINT64:
                 return std::numeric_limits<uint64_t>::max();
@@ -142,49 +144,49 @@ namespace maelstrom {
     dtype_t uint64{
         "uint64",
         primitive_t::UINT64,
-        [](void* v){ return boost::any(*static_cast<uint64_t*>(v)); }
+        [](void* v){ return std::any(*static_cast<uint64_t*>(v)); }
     };
 
     dtype_t uint32{
         "uint32",
         primitive_t::UINT32,
-        [](void* v){ return boost::any(*static_cast<uint32_t*>(v)); }
+        [](void* v){ return std::any(*static_cast<uint32_t*>(v)); }
     };
 
     dtype_t uint8{
         "uint8",
         primitive_t::UINT8,
-        [](void* v){ return boost::any(*static_cast<uint8_t*>(v)); }
+        [](void* v){ return std::any(*static_cast<uint8_t*>(v)); }
     };
 
     dtype_t int64{
         "int64",
         primitive_t::INT64,
-        [](void* v){ return boost::any(*static_cast<int64_t*>(v)); }
+        [](void* v){ return std::any(*static_cast<int64_t*>(v)); }
     };
 
     dtype_t int32{
         "int32",
         primitive_t::INT32,
-        [](void* v){ return boost::any(*static_cast<int32_t*>(v)); }
+        [](void* v){ return std::any(*static_cast<int32_t*>(v)); }
     };
 
     dtype_t int8{
         "int8",
         primitive_t::INT8,
-        [](void* v){ return boost::any(*static_cast<int8_t*>(v)); }
+        [](void* v){ return std::any(*static_cast<int8_t*>(v)); }
     };
 
     dtype_t float64{
         "float64",
         primitive_t::FLOAT64,
-        [](void* v){ return boost::any(*static_cast<double*>(v)); }
+        [](void* v){ return std::any(*static_cast<double*>(v)); }
     };
 
     dtype_t float32{
         "float32",
         primitive_t::FLOAT32,
-        [](void* v){ return boost::any(*static_cast<float*>(v)); }
+        [](void* v){ return std::any(*static_cast<float*>(v)); }
     };
 
     dtype_t default_dtype = float64;

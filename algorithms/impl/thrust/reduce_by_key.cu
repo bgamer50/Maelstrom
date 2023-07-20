@@ -292,12 +292,12 @@ namespace maelstrom {
     }
 
     std::pair<maelstrom::vector, maelstrom::vector> reduce_by_key_from_sorted_vec_dispatch_exec_policy(maelstrom::vector& input_keys, maelstrom::vector& input_values, maelstrom::reductor red, size_t max_unique_keys) {
-        boost::any exec_policy = maelstrom::get_execution_policy(input_keys).get();
+        std::any exec_policy = maelstrom::get_execution_policy(input_keys).get();
         const std::type_info& t = exec_policy.type();
         
         if(typeid(device_exec_t) == t) {
             return reduce_by_key_from_sorted_vec_dispatch_key(
-                boost::any_cast<device_exec_t>(exec_policy),
+                std::any_cast<device_exec_t>(exec_policy),
                 input_keys,
                 input_values,
                 red,
@@ -305,7 +305,7 @@ namespace maelstrom {
             );
         } else if(typeid(host_exec_t) == t) {
             return reduce_by_key_from_sorted_vec_dispatch_key(
-                boost::any_cast<host_exec_t>(exec_policy),
+                std::any_cast<host_exec_t>(exec_policy),
                 input_keys,
                 input_values,
                 red,

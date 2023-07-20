@@ -119,19 +119,19 @@ namespace maelstrom {
     }
 
     maelstrom::vector math_binary_op_dispatch_exec_policy(maelstrom::vector& left, maelstrom::vector& right, maelstrom::binary_op op) {
-        boost::any exec_policy = maelstrom::get_execution_policy(left).get();
+        std::any exec_policy = maelstrom::get_execution_policy(left).get();
         const std::type_info& t = exec_policy.type();
         
         if(typeid(device_exec_t) == t) {
             return math_binary_op_dispatch_val(
-                boost::any_cast<device_exec_t>(exec_policy),
+                std::any_cast<device_exec_t>(exec_policy),
                 left,
                 right,
                 op
             );
         } else if(typeid(host_exec_t) == t) {
             return math_binary_op_dispatch_val(
-                boost::any_cast<host_exec_t>(exec_policy),
+                std::any_cast<host_exec_t>(exec_policy),
                 left,
                 right,
                 op

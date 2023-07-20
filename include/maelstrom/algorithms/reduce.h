@@ -18,5 +18,5 @@ namespace maelstrom {
         as an any of the input datatype, except
         for the mean reduction, which always returns a double.
     */
-    std::pair<boost::any, size_t> reduce(maelstrom::vector& vec, maelstrom::reductor red);
+    std::pair<std::any, size_t> reduce(maelstrom::vector& vec, maelstrom::reductor red);
 }

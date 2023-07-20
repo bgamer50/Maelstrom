@@ -38,7 +38,7 @@ void test_unpack_basic() {
 
     for(size_t k = 0; k < unpacked_m_data.size(); ++k) {
         assert( 
-            boost::any_cast<int32_t>(unpacked_m_data[k].get(0)) == data[k]
+            std::any_cast<int32_t>(unpacked_m_data[k].get(0)) == data[k]
         );
     }
 }

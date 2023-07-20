@@ -10,12 +10,12 @@ namespace maelstrom {
         extern maelstrom::vector csr_to_coo_host_dispatch_val(maelstrom::vector& ptr, size_t nnz);
 
         maelstrom::vector csr_to_coo_dispatch_exec_policy(maelstrom::vector& ptr, size_t nnz) {
-            boost::any exec_policy = maelstrom::get_execution_policy(ptr).get();
+            std::any exec_policy = maelstrom::get_execution_policy(ptr).get();
             const std::type_info& t = exec_policy.type();
             
             if(typeid(device_exec_t) == t) {
                 return csr_to_coo_device_dispatch_val(
-                    boost::any_cast<device_exec_t>(exec_policy),
+                    std::any_cast<device_exec_t>(exec_policy),
                     ptr,
                     nnz
                 );

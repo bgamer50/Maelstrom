@@ -56,7 +56,7 @@ namespace maelstrom {
         );
     }
 
-    maelstrom::vector basic_sparse_matrix::get_1d_index_from_2d_index(maelstrom::vector& ix_r, maelstrom::vector& ix_c, boost::any index_not_found) {
+    maelstrom::vector basic_sparse_matrix::get_1d_index_from_2d_index(maelstrom::vector& ix_r, maelstrom::vector& ix_c, std::any index_not_found) {
         if(!this->sorted) this->sort(); // sort the col ptr
 
         if(this->format == CSR) {

@@ -35,7 +35,6 @@ void test_count_unique_basic() {
         cpp_array.size(),
         false
     );
-    m_array.name = "m_array";
 
     maelstrom::vector unique_values;
     maelstrom::vector unique_counts;

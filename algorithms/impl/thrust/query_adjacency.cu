@@ -36,12 +36,12 @@ namespace maelstrom {
                                                                                                                                     bool return_values,
                                                                                                                                     bool return_relations)
         {
-            boost::any exec_policy = maelstrom::get_execution_policy(row).get();
+            std::any exec_policy = maelstrom::get_execution_policy(row).get();
             const std::type_info& t = exec_policy.type();
             
             if(typeid(device_exec_t) == t) {
                 return query_adjacency_device_dispatch_ix(
-                    boost::any_cast<device_exec_t>(exec_policy),
+                    std::any_cast<device_exec_t>(exec_policy),
                     row,
                     col,
                     val,

@@ -9,5 +9,5 @@ namespace maelstrom {
         Does not modify the original vector.
         The returned vector always has dtype UINT64.
     */
-    maelstrom::vector filter(maelstrom::vector& vec, maelstrom::comparator cmp, boost::any cmp_val);
+    maelstrom::vector filter(maelstrom::vector& vec, maelstrom::comparator cmp, std::any cmp_val);
 }

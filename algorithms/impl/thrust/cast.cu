@@ -68,18 +68,18 @@ namespace maelstrom {
     }
 
     maelstrom::vector cast_dispatch_exec_policy(maelstrom::vector& vec, maelstrom::dtype_t new_type) {
-        boost::any exec_policy = maelstrom::get_execution_policy(vec).get();
+        std::any exec_policy = maelstrom::get_execution_policy(vec).get();
         const std::type_info& t = exec_policy.type();
         
         if(typeid(device_exec_t) == t) {
             return cast_dispatch_old_type(
-                boost::any_cast<device_exec_t>(exec_policy),
+                std::any_cast<device_exec_t>(exec_policy),
                 vec,
                 new_type
             );
         } else if(typeid(host_exec_t) == t) {
             return cast_dispatch_old_type(
-                boost::any_cast<host_exec_t>(exec_policy),
+                std::any_cast<host_exec_t>(exec_policy),
                 vec,
                 new_type
             );
