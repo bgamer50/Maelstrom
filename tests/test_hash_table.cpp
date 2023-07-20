@@ -55,7 +55,7 @@ void test_hash_table_device() {
         m_vals
     );
 
-    float not_found = boost::any_cast<float>(table.val_not_found());
+    float not_found = std::any_cast<float>(table.val_not_found());
     std::vector<int> cpp_ret_keys = {6, 9, 11, -1, 2};
     std::vector<float> cpp_expected_vals = {1.3f, not_found, not_found, not_found, 0.5f};
 
@@ -129,7 +129,7 @@ void test_hash_table_host() {
         m_vals
     );
 
-    float not_found = boost::any_cast<float>(table.val_not_found());
+    float not_found = std::any_cast<float>(table.val_not_found());
     std::vector<int> cpp_ret_keys = {6, 9, 11, -1, 2};
     std::vector<float> cpp_expected_vals = {1.3f, not_found, not_found, not_found, 0.5f};
 

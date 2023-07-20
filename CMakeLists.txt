@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.23.1)
 
 project(
     MAELSTROM
-    VERSION 0.1
+    VERSION 1.0.0
     LANGUAGES CXX CUDA
 )
 

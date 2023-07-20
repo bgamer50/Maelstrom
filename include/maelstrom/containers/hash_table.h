@@ -58,9 +58,9 @@ namespace maelstrom {
 
             maelstrom::vector contains(maelstrom::vector& keys);
 
-            inline boost::any key_not_found() { return maelstrom::max_value(this->key_dtype); }
+            inline std::any key_not_found() { return maelstrom::max_value(this->key_dtype); }
 
-            inline boost::any val_not_found() { return maelstrom::max_value(this->val_dtype); }
+            inline std::any val_not_found() { return maelstrom::max_value(this->val_dtype); }
 
     };
 
