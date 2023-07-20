@@ -8,10 +8,10 @@ project(
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CUDA_FLAGS "--expt-relaxed-constexpr --expt-extended-lambda")
+set(CMAKE_CUDA_FLAGS "-forward-unknown-to-host-compiler --expt-relaxed-constexpr --expt-extended-lambda")   
 
-# set(CMAKE_CUDA_ARCHITECTURES "61;62;70;75;86")
-set(CMAKE_CUDA_ARCHITECTURES "61")
+# Minimum supported arch is 75
+set(CMAKE_CUDA_ARCHITECTURES "86")
 
 set(POSITION_INDEPENDENT_CODE True)
 set(INTERFACE_POSITION_INDEPENDENT_CODE True)
@@ -106,7 +106,7 @@ target_link_libraries(
 )
 
 function(AddMaelstromTest EXEC_NAME)
-    
+
     add_executable(${EXEC_NAME} ${ARGN})
 
     set_target_properties(

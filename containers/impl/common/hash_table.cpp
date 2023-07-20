@@ -50,10 +50,13 @@ namespace maelstrom {
         switch(this->mem_type) {
             case HOST:
                 maelstrom::insert_hash_table<HOST>(this->data_ptr, keys, vals);
+                break;
             case DEVICE:
                 maelstrom::insert_hash_table<DEVICE>(this->data_ptr, keys, vals);
+                break;
             case MANAGED:
                 maelstrom::insert_hash_table<MANAGED>(this->data_ptr, keys, vals);
+                break;
             default:
                 throw std::runtime_error("unsupported memory type for hash table insertion");
         }
