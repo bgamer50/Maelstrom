@@ -5,6 +5,8 @@
 #include "maelstrom/algorithms/reduce_by_key.h"
 #include "maelstrom/algorithms/set.h"
 #include "maelstrom/algorithms/prefix_sum.h"
+#include "maelstrom/algorithms/arange.h"
+#include "maelstrom/algorithms/assign.h"
 
 namespace maelstrom {
     void basic_sparse_matrix::sort() {
@@ -70,19 +72,22 @@ namespace maelstrom {
         vals.clear();
 
         output_indices = maelstrom::select(this->row, output_indices);
-        auto sort_ix = maelstrom::sort(output_indices);
+
+        auto actual_counts = maelstrom::make_vector_like(output_counts);
+        actual_counts.resize(this->n_rows);
+        maelstrom::set(actual_counts, 0);
+        
+        maelstrom::assign(actual_counts, output_indices, output_counts);
         output_indices.clear();
+        output_counts.clear();
 
-        output_counts = maelstrom::select(output_counts, sort_ix);
-        sort_ix.clear();
-
-        maelstrom::vector first_zero(output_counts.get_mem_type(), output_counts.get_dtype(), 1);
+        maelstrom::vector first_zero(actual_counts.get_mem_type(), actual_counts.get_dtype(), 1);
         maelstrom::set(first_zero, 0);
-        output_counts.insert(0, first_zero);
+        actual_counts.insert(0, first_zero);
         first_zero.clear();
-        maelstrom::prefix_sum(output_counts);
+        maelstrom::prefix_sum(actual_counts);
 
-        this->row = std::move(output_counts);
+        this->row = std::move(actual_counts);
         this->format = CSR;
     }
 
@@ -94,10 +99,12 @@ namespace maelstrom {
         }
 
         std::swap(this->col, this->row);
+        std::swap(this->n_cols, this->n_rows);
         this->sorted = false;
 
         this->to_csr();
         std::swap(this->col, this->row);
+        std::swap(this->n_cols, this->n_rows);
         this->format = CSC;
     }
 }

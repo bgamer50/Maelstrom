@@ -85,7 +85,7 @@ namespace maelstrom {
             );
         }
 
-        throw std::runtime_error("Invalid execution policy");
+        throw std::runtime_error("Invalid execution policy for cast");
     }
 
     maelstrom::vector cast(maelstrom::vector& vec, maelstrom::dtype_t new_type) {

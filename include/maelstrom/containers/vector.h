@@ -176,7 +176,7 @@ namespace maelstrom {
     maelstrom::vector as_primitive_vector(maelstrom::vector& vec, bool view=true);
 
     /*
-        Makes a new vector with the same memory type and data type as the given vector.
+        Makes a new emtpy vector with the same memory type and data type as the given vector.
         
     */
    inline maelstrom::vector make_vector_like(maelstrom::vector& vec) {

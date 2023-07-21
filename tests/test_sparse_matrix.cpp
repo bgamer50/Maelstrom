@@ -211,8 +211,8 @@ void test_sparse_matrix_conversion() {
         maelstrom::vector(),
         m_rel,
         maelstrom::sparse_matrix_format::CSR,
-        5,
-        5,
+        6,
+        6,
         true
     );
 

@@ -66,6 +66,7 @@ add_library(
     algorithms/impl/thrust/query_adjacency.cu
     algorithms/impl/thrust/csr_to_coo.cu
     algorithms/impl/thrust/prefix_sum.cu
+    algorithms/impl/thrust/assign.cu
     algorithms/impl/cuda/search_sorted_device.cu
     algorithms/impl/cuda/query_adjacency_device.cu
     algorithms/impl/cuda/search_sorted_sparse_device.cu
@@ -153,3 +154,4 @@ AddMaelstromTest(test_sparse_matrix.exe tests/test_sparse_matrix.cpp)
 AddMaelstromTest(test_csr_to_coo.exe tests/test_csr_to_coo.cpp)
 AddMaelstromTest(test_prefix_sum.exe tests/test_prefix_sum.cpp)
 AddMaelstromTest(test_hash_table.exe tests/test_hash_table.cpp)
+AddMaelstromTest(test_assign.exe tests/test_assign.cpp)

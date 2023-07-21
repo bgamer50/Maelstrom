@@ -124,7 +124,7 @@ namespace maelstrom {
                 If vals is not provided, just sets the row/col (adjacency matrix).
                 Can optionally set relation too.
             */
-            virtual void set(maelstrom::vector new_rows, maelstrom::vector new_cols, maelstrom::vector new_vals=maelstrom::vector(), maelstrom::vector new_rels=maelstrom::vector()) = 0;
+            virtual void set(maelstrom::vector new_rows, size_t new_num_rows, maelstrom::vector new_cols, size_t new_num_cols, maelstrom::vector new_vals=maelstrom::vector(), maelstrom::vector new_rels=maelstrom::vector()) = 0;
 
             virtual void to_csr() = 0;
             virtual void to_csc() = 0;
@@ -230,7 +230,7 @@ namespace maelstrom {
             virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix, maelstrom::vector& rel_types, bool return_inner=true, bool return_values=false, bool return_relations=false);
 
             using sparse_matrix::set;
-            virtual void set(maelstrom::vector new_rows, maelstrom::vector new_cols, maelstrom::vector new_vals=maelstrom::vector(), maelstrom::vector new_rels=maelstrom::vector());
+            virtual void set(maelstrom::vector new_rows, size_t new_num_rows, maelstrom::vector new_cols, size_t new_num_cols, maelstrom::vector new_vals=maelstrom::vector(), maelstrom::vector new_rels=maelstrom::vector());
 
             using sparse_matrix::to_csr;
             virtual void to_csr();

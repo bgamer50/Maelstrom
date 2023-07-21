@@ -135,7 +135,7 @@ namespace maelstrom {
         throw std::runtime_error("adj-querying a COO matrix is unsupported");
     }
 
-    void basic_sparse_matrix::set(maelstrom::vector new_rows, maelstrom::vector new_cols, maelstrom::vector new_vals, maelstrom::vector new_rels) {
+    void basic_sparse_matrix::set(maelstrom::vector new_rows, size_t new_num_rows, maelstrom::vector new_cols, size_t new_num_cols, maelstrom::vector new_vals, maelstrom::vector new_rels) {
         if(this->format != COO) throw std::runtime_error("Can only set for a COO matrix");
 
         if(new_rows.size() != new_cols.size()) throw std::runtime_error("new rows size must match new cols size");
@@ -169,6 +169,8 @@ namespace maelstrom {
             );
         }
 
+        this->n_rows = new_num_rows;
+        this->n_cols = new_num_cols;
         this->sorted = false;
     }
 
