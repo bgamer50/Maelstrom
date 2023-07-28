@@ -48,8 +48,12 @@ namespace maelstrom {
             /*
                 Sorts this sparse matrix (row then col for COO, col for CSR,
                 row for CSC).
+                If return_perm is true, and this is a COO matrix, returns the permutation
+                from sorting this matrix.
+                If return_perm is false, or this is not a COO matrix, an empty vector
+                is returned.
             */
-            virtual void sort() = 0;
+            virtual maelstrom::vector sort(bool return_perm=false) = 0;
 
             /*
                 Returns the format of this matrix. 
@@ -99,6 +103,8 @@ namespace maelstrom {
             virtual std::pair<maelstrom::vector, maelstrom::vector> get_relations_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) = 0;
 
             virtual maelstrom::vector get_1d_index_from_2d_index(maelstrom::vector& ix_r, maelstrom::vector& ix_c, std::any index_not_found=std::any()) = 0;
+
+            virtual maelstrom::vector get_1d_index_from_value(maelstrom::vector& query_val) = 0;
 
             /*
                 Depending on the format of this matrix, this operation is slightly different.
@@ -197,7 +203,7 @@ namespace maelstrom {
             inline virtual bool is_sorted() { return this->sorted; }
 
             using sparse_matrix::sort;
-            virtual void sort();
+            virtual maelstrom::vector sort(bool return_perm=false);
 
             using sparse_matrix::get_format;
             inline virtual sparse_matrix_format get_format() { return this->format; }
@@ -225,6 +231,9 @@ namespace maelstrom {
 
             using sparse_matrix::get_1d_index_from_2d_index;
             virtual maelstrom::vector get_1d_index_from_2d_index(maelstrom::vector& ix_r, maelstrom::vector& ix_c, std::any index_not_found=std::any());
+        
+            using sparse_matrix::get_1d_index_from_value;
+            virtual maelstrom::vector get_1d_index_from_value(maelstrom::vector& query_val);
 
             using sparse_matrix::query_adjacency;
             virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix, maelstrom::vector& rel_types, bool return_inner=true, bool return_values=false, bool return_relations=false);

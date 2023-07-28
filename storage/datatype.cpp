@@ -28,7 +28,7 @@ namespace maelstrom {
         throw std::runtime_error("Invalid type");
     }
 
-    primitive_t prim_type_of(std::any& a) {
+    primitive_t prim_type_of(std::any a) {
         const std::type_info& t = a.type();
         if(t == typeid(uint64_t)) return primitive_t::UINT64;
         if(t == typeid(uint32_t)) return primitive_t::UINT32;
@@ -141,52 +141,64 @@ namespace maelstrom {
         return (other.name != this->name) || (other.prim_type != this->prim_type);
     }
 
+    // The serializers below may seem redundant, but are necessary because they
+    // will throw the correct error when a type conversion needs to occur.
+    // Otherwise, a bad_any_cast might get thrown.
+
     dtype_t uint64{
         "uint64",
         primitive_t::UINT64,
-        [](void* v){ return std::any(*static_cast<uint64_t*>(v)); }
+        [](void* v){ return std::any(*static_cast<uint64_t*>(v)); },
+        [](std::any a){ return std::any(std::any_cast<uint64_t>(a)); }
     };
 
     dtype_t uint32{
         "uint32",
         primitive_t::UINT32,
-        [](void* v){ return std::any(*static_cast<uint32_t*>(v)); }
+        [](void* v){ return std::any(*static_cast<uint32_t*>(v)); },
+        [](std::any a){ return std::any(std::any_cast<uint32_t>(a)); }
     };
 
     dtype_t uint8{
         "uint8",
         primitive_t::UINT8,
-        [](void* v){ return std::any(*static_cast<uint8_t*>(v)); }
+        [](void* v){ return std::any(*static_cast<uint8_t*>(v)); },
+        [](std::any a){ return std::any(std::any_cast<uint8_t>(a)); }
     };
 
     dtype_t int64{
         "int64",
         primitive_t::INT64,
-        [](void* v){ return std::any(*static_cast<int64_t*>(v)); }
+        [](void* v){ return std::any(*static_cast<int64_t*>(v)); },
+        [](std::any a){ return std::any(std::any_cast<int64_t>(a)); }
     };
 
     dtype_t int32{
         "int32",
         primitive_t::INT32,
-        [](void* v){ return std::any(*static_cast<int32_t*>(v)); }
+        [](void* v){ return std::any(*static_cast<int32_t*>(v)); },
+        [](std::any a){ return std::any(std::any_cast<int32_t>(a)); }
     };
 
     dtype_t int8{
         "int8",
         primitive_t::INT8,
-        [](void* v){ return std::any(*static_cast<int8_t*>(v)); }
+        [](void* v){ return std::any(*static_cast<int8_t*>(v)); },
+        [](std::any a){ return std::any(std::any_cast<int8_t>(a)); }
     };
 
     dtype_t float64{
         "float64",
         primitive_t::FLOAT64,
-        [](void* v){ return std::any(*static_cast<double*>(v)); }
+        [](void* v){ return std::any(*static_cast<double*>(v)); },
+        [](std::any a){ return std::any(std::any_cast<double*>(a)); }
     };
 
     dtype_t float32{
         "float32",
         primitive_t::FLOAT32,
-        [](void* v){ return std::any(*static_cast<float*>(v)); }
+        [](void* v){ return std::any(*static_cast<float*>(v)); },
+        [](std::any a){ return std::any(std::any_cast<float*>(a)); }
     };
 
     dtype_t default_dtype = float64;

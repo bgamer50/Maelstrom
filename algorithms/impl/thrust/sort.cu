@@ -3,6 +3,8 @@
 
 namespace maelstrom {
 
+    extern maelstrom::vector sort_uint_index_dispatch_exec_policy(std::vector<std::reference_wrapper<maelstrom::vector>> vectors);
+
     template<typename E, typename T>
     maelstrom::vector t_sort(E exec_policy, std::vector<std::reference_wrapper<maelstrom::vector>> vectors) {
         maelstrom::vector sorted_indices(
@@ -148,12 +150,23 @@ namespace maelstrom {
     maelstrom::vector sort(std::vector<std::reference_wrapper<maelstrom::vector>> vectors) {
         if(vectors.size() > 1) {
             auto dtype = vectors.front().get().get_dtype();
-            auto mem_type = vectors.front().get().get_mem_type();
             auto sz = vectors.front().get().size();
+            bool dtype_mismatch = false;
+            bool uint64_uint32_prim_only = true;
             for(auto& vec : vectors) {
-                if(vec.get().get_dtype() != dtype) throw std::runtime_error("Data types in vectors to be sorted must match!");
-                if(vec.get().get_mem_type() != mem_type) throw std::runtime_error("Memory types in vectors to be sorted must match!");
+                auto current_dtype = vec.get().get_dtype();
+                if(current_dtype != dtype) dtype_mismatch = true;
+                if(current_dtype.prim_type != UINT64 && current_dtype.prim_type != UINT32 ) uint64_uint32_prim_only = false;
                 if(vec.get().size() != sz) throw std::runtime_error("Sizes of vectors to be sorted must match!");
+                // TODO check memtype compatibility
+            }
+
+            if(dtype_mismatch) {
+                if(uint64_uint32_prim_only) {
+                    if(vectors.size() <= 3) return sort_uint_index_dispatch_exec_policy(vectors);
+                    else throw std::runtime_error("Sort index only supported with 3 or fewer vectors");
+                }
+                throw std::runtime_error("Types of vectors to be sorted must match!");
             }
         }
         return sort_dispatch_exec_policy(std::move(vectors));

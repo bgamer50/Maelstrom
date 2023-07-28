@@ -9,8 +9,14 @@
 #include "maelstrom/algorithms/assign.h"
 
 namespace maelstrom {
-    void basic_sparse_matrix::sort() {
-        if(this->sorted) return;
+    maelstrom::vector basic_sparse_matrix::sort(bool return_perm) {
+        if(this->sorted) {
+            if(return_perm) {
+                return maelstrom::arange(this->val.get_mem_type(), this->val.size());
+            } else {
+                return maelstrom::vector();
+            }
+        }
 
         if(this->format != COO) throw std::runtime_error("Sorting CSR/CSC is currently unsupported!");
 
@@ -22,7 +28,8 @@ namespace maelstrom {
         if(this->has_values()) this->val = std::move(maelstrom::select(this->val, sorted_ix));
         if(this->has_relations()) this->rel = std::move(maelstrom::select(this->rel, sorted_ix));
         
-        sorted_ix.clear();
+        if(return_perm) return sorted_ix;
+        return maelstrom::vector();
     }
 
     void basic_sparse_matrix::to_coo() {

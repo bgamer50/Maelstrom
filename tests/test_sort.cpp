@@ -9,11 +9,13 @@ using namespace maelstrom::test;
 
 void test_sort_basic();
 void test_sort_multi();
+void test_sort_mixed_int();
 
 int main(int argc, char* argv[]) {
     try {
         test_sort_basic();
         test_sort_multi();
+        test_sort_mixed_int();
     } catch(std::exception& err) {
         std::cerr << "FAIL!" << std::endl;
         std::cerr << err.what() << std::endl;
@@ -98,4 +100,24 @@ void test_sort_multi() {
     assert_array_equals(static_cast<double*>(m_array_1.data()), expected_1.data(), expected_1.size());
     assert_array_equals(static_cast<double*>(m_array_2.data()), expected_2.data(), expected_2.size());
     assert_array_equals(static_cast<double*>(m_array_3.data()), expected_3.data(), expected_3.size());
+}
+
+void test_sort_mixed_int() {
+    std::vector<uint64_t> vec1 = {5ul, 0ul, 7ul, 6ul, 3ul, 2ul, 0ul, 9ul, 6ul, 6ul, 7ul};
+    std::vector<uint32_t> vec2 = {5u , 5u , 5u , 1u , 2u , 3u , 5u , 4u , 3u , 2u , 1u };
+    std::vector<uint64_t> vec3 = {7ul, 6ul, 5ul, 5ul, 6ul, 8ul, 7ul, 2ul, 3ul, 1ul, 7ul};
+
+    maelstrom::vector m_vec1(maelstrom::MANAGED, maelstrom::uint64, vec1.data(), vec1.size(), false);
+    maelstrom::vector m_vec2(maelstrom::MANAGED, maelstrom::uint32, vec2.data(), vec2.size(), false);
+    maelstrom::vector m_vec3(maelstrom::MANAGED, maelstrom::uint64, vec3.data(), vec3.size(), false);
+
+    auto ix = maelstrom::sort({std::ref(m_vec1), std::ref(m_vec2), std::ref(m_vec3)});
+
+    std::vector<uint64_t> expected_1 = {0, 0, 2, 3, 5, 6, 6, 6, 7, 7, 9};
+    std::vector<uint32_t> expected_2 = {5, 5, 3, 2, 5, 1, 2, 3, 1, 5, 4};
+    std::vector<uint64_t> expected_3 = {6, 7, 8, 6, 7, 5, 1, 3, 7, 5, 2};
+
+    assert_array_equals(static_cast<uint64_t*>(m_vec1.data()), expected_1.data(), expected_1.size());
+    assert_array_equals(static_cast<uint32_t*>(m_vec2.data()), expected_2.data(), expected_2.size());
+    assert_array_equals(static_cast<uint64_t*>(m_vec3.data()), expected_3.data(), expected_3.size());
 }

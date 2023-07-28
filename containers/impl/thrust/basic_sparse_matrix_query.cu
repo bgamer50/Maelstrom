@@ -5,9 +5,12 @@
 #include "maelstrom/algorithms/increment.h"
 #include "maelstrom/algorithms/arange.h"
 #include "maelstrom/algorithms/filter.h"
+#include "maelstrom/algorithms/sort.h"
 
 #include "maelstrom/algorithms/sparse/query_adjacency.h"
 #include "maelstrom/algorithms/sparse/search_sorted_sparse.h"
+
+#include "maelstrom/util/any_utils.cuh"
 
 namespace maelstrom {
 
@@ -67,6 +70,18 @@ namespace maelstrom {
 
         // COO
         throw std::runtime_error("2d-indexing a COO matrix is currently unsupported");        
+    }
+    
+    maelstrom::vector basic_sparse_matrix::get_1d_index_from_value(maelstrom::vector& query_val) {
+        auto sort_ix = maelstrom::sort(this->val);
+        auto e_index = maelstrom::search_sorted(this->val, query_val);
+        maelstrom::increment(e_index, maelstrom::DECREMENT);
+        e_index = maelstrom::select(sort_ix, e_index);
+        
+        // reverse the sort
+        sort_ix = maelstrom::sort(sort_ix);
+        this->val = maelstrom::select(this->val, sort_ix);
+        return e_index;
     }
 
     std::pair<maelstrom::vector, maelstrom::vector> basic_sparse_matrix::get_values_2d(maelstrom::vector& ix_r, maelstrom::vector& ix_c) {
@@ -145,6 +160,11 @@ namespace maelstrom {
         if(new_vals.empty() && !this->val.empty()) throw std::runtime_error("values must be inserted since this matrix has values");
         if(new_rels.empty() && !this->rel.empty()) throw std::runtime_error("relations must be inserted since this matrix has values");
 
+        this->n_rows = new_num_rows;
+        this->n_cols = new_num_cols;
+
+        if(new_rows.empty()) return;
+
         this->row.insert(
             this->row.size(),
             new_rows
@@ -169,8 +189,6 @@ namespace maelstrom {
             );
         }
 
-        this->n_rows = new_num_rows;
-        this->n_cols = new_num_cols;
         this->sorted = false;
     }
 

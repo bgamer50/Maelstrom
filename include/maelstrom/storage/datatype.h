@@ -21,7 +21,7 @@ namespace maelstrom {
 
     inline size_t size_of(dtype_t& dtype) { return size_of(dtype.prim_type); }
 
-    primitive_t prim_type_of(std::any& a);
+    primitive_t prim_type_of(std::any a);
 
     dtype_t dtype_from_prim_type(primitive_t prim_type);
 

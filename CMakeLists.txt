@@ -25,6 +25,7 @@ add_library(
     containers/impl/common/vector_math.cpp
     containers/impl/common/hash_table.cpp
     storage/datatype.cpp
+    storage/strings.cpp
     algorithms/impl/common/unpack.cpp
     algorithms/impl/host/search_sorted_host.cpp
     algorithms/impl/host/query_adjacency_host.cpp
@@ -67,6 +68,7 @@ add_library(
     algorithms/impl/thrust/csr_to_coo.cu
     algorithms/impl/thrust/prefix_sum.cu
     algorithms/impl/thrust/assign.cu
+    algorithms/impl/thrust/sort_uint_index.cu
     algorithms/impl/cuda/search_sorted_device.cu
     algorithms/impl/cuda/query_adjacency_device.cu
     algorithms/impl/cuda/search_sorted_sparse_device.cu
