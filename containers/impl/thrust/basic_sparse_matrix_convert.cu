@@ -8,6 +8,8 @@
 #include "maelstrom/algorithms/arange.h"
 #include "maelstrom/algorithms/assign.h"
 
+#include <iostream>
+
 namespace maelstrom {
     maelstrom::vector basic_sparse_matrix::sort(bool return_perm) {
         if(this->sorted) {
@@ -30,6 +32,18 @@ namespace maelstrom {
         
         if(return_perm) return sorted_ix;
         return maelstrom::vector();
+    }
+
+    maelstrom::vector basic_sparse_matrix::sort_values(bool return_perm) {
+        if(this->format != COO) throw std::runtime_error("Sorting by values is only valid for COO matrices!");
+
+        auto sorted_ix = maelstrom::sort(this->val);
+        maelstrom::select(this->row, sorted_ix);
+        maelstrom::select(this->col, sorted_ix);
+        maelstrom::select(this->rel, sorted_ix);
+
+        this->sorted = false;
+        return return_perm ? sorted_ix : maelstrom::vector();
     }
 
     void basic_sparse_matrix::to_coo() {
@@ -66,7 +80,12 @@ namespace maelstrom {
             this->row.get_dtype(),
             this->row.size()
         );
-        maelstrom::set(vals, 1);
+        auto vals_prim_view = maelstrom::as_primitive_vector(vals, true);
+
+        maelstrom::set(
+            vals_prim_view,
+            1
+        );
 
         maelstrom::vector output_counts;
         maelstrom::vector output_indices;
@@ -82,14 +101,16 @@ namespace maelstrom {
 
         auto actual_counts = maelstrom::make_vector_like(output_counts);
         actual_counts.resize(this->n_rows);
-        maelstrom::set(actual_counts, 0);
+        auto actual_counts_prim_view = maelstrom::as_primitive_vector(actual_counts, true);
+        maelstrom::set(actual_counts_prim_view, 0);
         
         maelstrom::assign(actual_counts, output_indices, output_counts);
         output_indices.clear();
         output_counts.clear();
 
         maelstrom::vector first_zero(actual_counts.get_mem_type(), actual_counts.get_dtype(), 1);
-        maelstrom::set(first_zero, 0);
+        auto first_zero_prim_view = maelstrom::as_primitive_vector(first_zero, true);
+        maelstrom::set(first_zero_prim_view, 0);
         actual_counts.insert(0, first_zero);
         first_zero.clear();
         maelstrom::prefix_sum(actual_counts);

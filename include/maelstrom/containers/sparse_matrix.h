@@ -56,6 +56,19 @@ namespace maelstrom {
             virtual maelstrom::vector sort(bool return_perm=false) = 0;
 
             /*
+                Sorts a COO matrix by its values.  Strictly, a COO sorted by
+                values isn't considered sorted, so is_sorted() after calling
+                this function will return false.
+                Invalid operation for CSR and CSC matrices.
+
+                If return_perm is true, the permutation from sorting the coo
+                matrix is returned.
+                If return_perm is false, the permutation from sorting the coo
+                matrix is not returned.
+            */
+            virtual maelstrom::vector sort_values(bool return_perm=false) = 0;
+
+            /*
                 Returns the format of this matrix. 
             */
             virtual sparse_matrix_format get_format() = 0;
@@ -122,8 +135,11 @@ namespace maelstrom {
 
                 Has flags to return the inner index (col for CSR, row for CSC), values, and relations.
                 Defaults to only returning the inner index (return_inner=true, return_values=false, return_relations=false).
+
+                If return_1d_index_as_values=true, and return_values=true, instead of returning the values, the 1d index
+                of the adjacency is returned instead.
             */
-            virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix, maelstrom::vector& rel_types, bool return_inner=true, bool return_values=false, bool return_relations=false) = 0;
+            virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix, maelstrom::vector& rel_types, bool return_inner=true, bool return_values=false, bool return_relations=false, bool return_1d_index_as_values=false) = 0;
 
             /*
                 Sets (row, col) = val for each row/col/val in rows/cols/vals.
@@ -131,6 +147,12 @@ namespace maelstrom {
                 Can optionally set relation too.
             */
             virtual void set(maelstrom::vector new_rows, size_t new_num_rows, maelstrom::vector new_cols, size_t new_num_cols, maelstrom::vector new_vals=maelstrom::vector(), maelstrom::vector new_rels=maelstrom::vector()) = 0;
+
+            /*
+                Sets the values to the given values.  The new_values vector must either be an empty vector (which remove all values),
+                or have the same size as the number of nonzero elements in this matrix.
+            */
+            virtual void set_values(maelstrom::vector new_values) = 0;
 
             virtual void to_csr() = 0;
             virtual void to_csc() = 0;
@@ -205,6 +227,9 @@ namespace maelstrom {
             using sparse_matrix::sort;
             virtual maelstrom::vector sort(bool return_perm=false);
 
+            using sparse_matrix::sort_values;
+            virtual maelstrom::vector sort_values(bool return_perm=false);
+
             using sparse_matrix::get_format;
             inline virtual sparse_matrix_format get_format() { return this->format; }
 
@@ -236,10 +261,16 @@ namespace maelstrom {
             virtual maelstrom::vector get_1d_index_from_value(maelstrom::vector& query_val);
 
             using sparse_matrix::query_adjacency;
-            virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix, maelstrom::vector& rel_types, bool return_inner=true, bool return_values=false, bool return_relations=false);
+            virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix, maelstrom::vector& rel_types, bool return_inner=true, bool return_values=false, bool return_relations=false, bool return_1d_index_as_values=false);
 
             using sparse_matrix::set;
             virtual void set(maelstrom::vector new_rows, size_t new_num_rows, maelstrom::vector new_cols, size_t new_num_cols, maelstrom::vector new_vals=maelstrom::vector(), maelstrom::vector new_rels=maelstrom::vector());
+
+            using sparse_matrix::set_values;
+            inline virtual void set_values(maelstrom::vector new_values) {
+                if(!new_values.empty() && (new_values.size() != this->num_nonzero())) throw std::runtime_error("Size of new values does not match number of nonzero elements!");
+                this->val = std::move(new_values);
+            }
 
             using sparse_matrix::to_csr;
             virtual void to_csr();

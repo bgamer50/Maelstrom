@@ -17,7 +17,7 @@ set(POSITION_INDEPENDENT_CODE True)
 set(INTERFACE_POSITION_INDEPENDENT_CODE True)
 
 add_library(
-    maelstrom
+    maelstrom SHARED
 
     # cpp
     containers/impl/common/vector_construct.cpp

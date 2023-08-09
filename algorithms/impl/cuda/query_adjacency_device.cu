@@ -42,7 +42,7 @@ namespace maelstrom {
         }
 
         template <typename I, typename V, typename R>
-        __global__ void k_query_adjacency(I* row, I* col, R* rel, V* val, I* query, size_t query_size, R* query_rel, size_t query_rel_size, size_t* ps, size_t* origin, I* adjacent, R* rel_adjacent, V* val_adjacent, bool return_adj, bool return_rel, bool return_val) {
+        __global__ void k_query_adjacency(I* row, I* col, R* rel, V* val, I* query, size_t query_size, R* query_rel, size_t query_rel_size, size_t* ps, size_t* origin, I* adjacent, R* rel_adjacent, V* val_adjacent, bool return_adj, bool return_rel, bool return_val, bool return_1d_index_as_values) {
             const size_t index = blockIdx.x * blockDim.x + threadIdx.x;
             const size_t stride = blockDim.x * gridDim.x;
             
@@ -72,7 +72,13 @@ namespace maelstrom {
                         origin[output_index] = i;
                         if(return_adj) adjacent[output_index] = col[j];
                         if(return_rel) rel_adjacent[output_index] = rel[j];
-                        if(return_val) val_adjacent[output_index] = val[j];
+                        if(return_val) {
+                            if(return_1d_index_as_values) {
+                                val_adjacent[output_index] = j;
+                            } else {
+                                val_adjacent[output_index] = val[j];
+                            }
+                        }
                         ++output_index;
                     }
                 }
@@ -89,7 +95,8 @@ namespace maelstrom {
                                                                                                                     maelstrom::vector& rel_types,
                                                                                                                     bool return_inner,
                                                                                                                     bool return_values,
-                                                                                                                    bool return_relations) 
+                                                                                                                    bool return_relations,
+                                                                                                                    bool return_1d_index_as_values) 
         {
             size_t ix_size = ix.size();
 
@@ -127,26 +134,55 @@ namespace maelstrom {
             maelstrom::vector origin(row.get_mem_type(), uint64, output_size);
             maelstrom::vector adjacent(row.get_mem_type(), row.get_dtype(), return_inner ? output_size : 0);
             maelstrom::vector rel_adjacent(row.get_mem_type(), rel.get_dtype(), return_relations ? output_size : 0);
-            maelstrom::vector val_adjacent(row.get_mem_type(), val.get_dtype(), return_values ? output_size : 0);
+            
+            maelstrom::vector val_adjacent;
+            if(return_1d_index_as_values) {
+                val_adjacent = maelstrom::vector(row.get_mem_type(), row.get_dtype(), return_values ? output_size : 0);
+            } else {
+                val_adjacent = maelstrom::vector(row.get_mem_type(), val.get_dtype(), return_values ? output_size : 0);
+            }
 
-            k_query_adjacency<<<num_blocks, MAELSTROM_DEFAULT_BLOCK_SIZE>>>(
-                static_cast<I*>(row.data()),
-                static_cast<I*>(col.data()),
-                static_cast<R*>(rel.data()),
-                static_cast<V*>(val.data()),
-                static_cast<I*>(ix.data()),
-                ix_size,
-                static_cast<R*>(rel_types.data()),
-                rel_types.size(),
-                static_cast<size_t*>(output_memory.data()),
-                static_cast<size_t*>(origin.data()),
-                static_cast<I*>(adjacent.data()),
-                static_cast<R*>(rel_adjacent.data()),
-                static_cast<V*>(val_adjacent.data()),
-                return_inner,
-                return_relations,
-                return_values
-            );
+            if(return_1d_index_as_values) {
+                k_query_adjacency<<<num_blocks, MAELSTROM_DEFAULT_BLOCK_SIZE>>>(
+                    static_cast<I*>(row.data()),
+                    static_cast<I*>(col.data()),
+                    static_cast<R*>(rel.data()),
+                    static_cast<I*>(nullptr),
+                    static_cast<I*>(ix.data()),
+                    ix_size,
+                    static_cast<R*>(rel_types.data()),
+                    rel_types.size(),
+                    static_cast<size_t*>(output_memory.data()),
+                    static_cast<size_t*>(origin.data()),
+                    static_cast<I*>(adjacent.data()),
+                    static_cast<R*>(rel_adjacent.data()),
+                    static_cast<I*>(val_adjacent.data()),
+                    return_inner,
+                    return_relations,
+                    return_values,
+                    return_1d_index_as_values
+                );
+            } else {
+                k_query_adjacency<<<num_blocks, MAELSTROM_DEFAULT_BLOCK_SIZE>>>(
+                    static_cast<I*>(row.data()),
+                    static_cast<I*>(col.data()),
+                    static_cast<R*>(rel.data()),
+                    static_cast<V*>(val.data()),
+                    static_cast<I*>(ix.data()),
+                    ix_size,
+                    static_cast<R*>(rel_types.data()),
+                    rel_types.size(),
+                    static_cast<size_t*>(output_memory.data()),
+                    static_cast<size_t*>(origin.data()),
+                    static_cast<I*>(adjacent.data()),
+                    static_cast<R*>(rel_adjacent.data()),
+                    static_cast<V*>(val_adjacent.data()),
+                    return_inner,
+                    return_relations,
+                    return_values,
+                    return_1d_index_as_values
+                );
+            }
             cudaDeviceSynchronize();
             maelstrom::cuda::cudaCheckErrors("k_query_adjacency");
 
@@ -168,7 +204,8 @@ namespace maelstrom {
                                                                                                                             maelstrom::vector& rel_types,
                                                                                                                             bool return_inner,
                                                                                                                             bool return_values,
-                                                                                                                            bool return_relations) 
+                                                                                                                            bool return_relations,
+                                                                                                                            bool return_1d_index_as_values) 
         {
             if(rel_types.empty()) {
                 return exec_query_adjacency_device<E, I, V, uint8_t>(
@@ -181,7 +218,8 @@ namespace maelstrom {
                     rel_types,
                     return_inner,
                     return_values,
-                    return_relations
+                    return_relations,
+                    return_1d_index_as_values
                 );
             }
 
@@ -198,7 +236,8 @@ namespace maelstrom {
                         rel_types,
                         return_inner,
                         return_values,
-                        return_relations
+                        return_relations,
+                        return_1d_index_as_values
                     );
             }
 
@@ -215,7 +254,8 @@ namespace maelstrom {
                                                                                                                             maelstrom::vector& rel_types,
                                                                                                                             bool return_inner,
                                                                                                                             bool return_values,
-                                                                                                                            bool return_relations)
+                                                                                                                            bool return_relations,
+                                                                                                                            bool return_1d_index_as_values)
         {
             switch(val.get_dtype().prim_type) {
                 case UINT64:
@@ -229,7 +269,8 @@ namespace maelstrom {
                         rel_types,
                         return_inner,
                         return_values,
-                        return_relations
+                        return_relations,
+                        return_1d_index_as_values
                     );
                 case UINT32:
                     return query_adjacency_device_dispatch_rel<E, I, uint32_t>(
@@ -242,7 +283,8 @@ namespace maelstrom {
                         rel_types,
                         return_inner,
                         return_values,
-                        return_relations
+                        return_relations,
+                        return_1d_index_as_values
                     );
                 case UINT8:
                     return query_adjacency_device_dispatch_rel<E, I, uint8_t>(
@@ -255,7 +297,8 @@ namespace maelstrom {
                         rel_types,
                         return_inner,
                         return_values,
-                        return_relations
+                        return_relations,
+                        return_1d_index_as_values
                     );
                 case INT64:
                     return query_adjacency_device_dispatch_rel<E, I, int64_t>(
@@ -268,7 +311,8 @@ namespace maelstrom {
                         rel_types,
                         return_inner,
                         return_values,
-                        return_relations
+                        return_relations,
+                        return_1d_index_as_values
                     );
                 case INT32:
                     return query_adjacency_device_dispatch_rel<E, I, int32_t>(
@@ -281,7 +325,8 @@ namespace maelstrom {
                         rel_types,
                         return_inner,
                         return_values,
-                        return_relations
+                        return_relations,
+                        return_1d_index_as_values
                     );
                 case INT8:
                     return query_adjacency_device_dispatch_rel<E, I, int8_t>(
@@ -294,7 +339,8 @@ namespace maelstrom {
                         rel_types,
                         return_inner,
                         return_values,
-                        return_relations
+                        return_relations,
+                        return_1d_index_as_values
                     );
                 case FLOAT64:
                     return query_adjacency_device_dispatch_rel<E, I, double>(
@@ -307,7 +353,8 @@ namespace maelstrom {
                         rel_types,
                         return_inner,
                         return_values,
-                        return_relations
+                        return_relations,
+                        return_1d_index_as_values
                     );
                 case FLOAT32:
                     return query_adjacency_device_dispatch_rel<E, I, float>(
@@ -320,7 +367,8 @@ namespace maelstrom {
                         rel_types,
                         return_inner,
                         return_values,
-                        return_relations
+                        return_relations,
+                        return_1d_index_as_values
                     );
             }
 
@@ -337,7 +385,8 @@ namespace maelstrom {
                                                                                                                            maelstrom::vector& rel_types,
                                                                                                                            bool return_inner,
                                                                                                                            bool return_values,
-                                                                                                                           bool return_relations)
+                                                                                                                           bool return_relations,
+                                                                                                                           bool return_1d_index_as_values)
         {
             switch(row.get_dtype().prim_type) {
                 case UINT64:
@@ -351,7 +400,8 @@ namespace maelstrom {
                         rel_types,
                         return_inner,
                         return_values,
-                        return_relations
+                        return_relations,
+                        return_1d_index_as_values
                     );
                 case UINT32:
                     return query_adjacency_device_dispatch_val<E, uint32_t>(
@@ -364,7 +414,8 @@ namespace maelstrom {
                         rel_types,
                         return_inner,
                         return_values,
-                        return_relations
+                        return_relations,
+                        return_1d_index_as_values
                     );
                 case UINT8:
                     return query_adjacency_device_dispatch_val<E, uint8_t>(
@@ -377,7 +428,8 @@ namespace maelstrom {
                         rel_types,
                         return_inner,
                         return_values,
-                        return_relations
+                        return_relations,
+                        return_1d_index_as_values
                     );
                 case INT64:
                     return query_adjacency_device_dispatch_val<E, int64_t>(
@@ -390,7 +442,8 @@ namespace maelstrom {
                         rel_types,
                         return_inner,
                         return_values,
-                        return_relations
+                        return_relations,
+                        return_1d_index_as_values
                     );
                 case INT32:
                     return query_adjacency_device_dispatch_val<E, int32_t>(
@@ -403,7 +456,8 @@ namespace maelstrom {
                         rel_types,
                         return_inner,
                         return_values,
-                        return_relations
+                        return_relations,
+                        return_1d_index_as_values
                     );
             }
 
@@ -420,7 +474,8 @@ namespace maelstrom {
                                                                                                                                 maelstrom::vector& rel_types,
                                                                                                                                 bool return_inner,
                                                                                                                                 bool return_values,
-                                                                                                                                bool return_relations);
+                                                                                                                                bool return_relations,
+                                                                                                                                bool return_1d_index_as_values);
 
     }
 }

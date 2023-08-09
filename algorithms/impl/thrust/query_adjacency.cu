@@ -12,7 +12,8 @@ namespace maelstrom {
                                                                                                                                        maelstrom::vector& rel_types,
                                                                                                                                        bool return_inner,
                                                                                                                                        bool return_values,
-                                                                                                                                       bool return_relations);
+                                                                                                                                       bool return_relations,
+                                                                                                                                       bool return_1d_index_as_values);
     
         template<typename E> 
         extern std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency_device_dispatch_ix(E execution_policy,
@@ -24,7 +25,8 @@ namespace maelstrom {
                                                                                                                                          maelstrom::vector& rel_types,
                                                                                                                                          bool return_inner,
                                                                                                                                          bool return_values,
-                                                                                                                                         bool return_relations);
+                                                                                                                                         bool return_relations,
+                                                                                                                                         bool return_1d_index_as_values);
 
         std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency_dispatch_exec_policy(maelstrom::vector& row,
                                                                                                                                     maelstrom::vector& col,
@@ -34,7 +36,8 @@ namespace maelstrom {
                                                                                                                                     maelstrom::vector& rel_types,
                                                                                                                                     bool return_inner,
                                                                                                                                     bool return_values,
-                                                                                                                                    bool return_relations)
+                                                                                                                                    bool return_relations,
+                                                                                                                                    bool return_1d_index_as_values)
         {
             std::any exec_policy = maelstrom::get_execution_policy(row).get();
             const std::type_info& t = exec_policy.type();
@@ -50,7 +53,8 @@ namespace maelstrom {
                     rel_types,
                     return_inner,
                     return_values,
-                    return_relations
+                    return_relations,
+                    return_1d_index_as_values
                 );
             } else if(typeid(host_exec_t) == t) {
                 return query_adjacency_host_dispatch_ix(
@@ -62,7 +66,8 @@ namespace maelstrom {
                     rel_types,
                     return_inner,
                     return_values,
-                    return_relations
+                    return_relations,
+                    return_1d_index_as_values
                 );
             }
 
@@ -77,7 +82,8 @@ namespace maelstrom {
                                                                                                                maelstrom::vector& rel_types,
                                                                                                                bool return_inner,
                                                                                                                bool return_values,
-                                                                                                               bool return_relations)
+                                                                                                               bool return_relations,
+                                                                                                               bool return_1d_index_as_values)
         {
             if(row.get_dtype() != col.get_dtype()) throw std::runtime_error("dtype of row and col must match");
             if(ix.get_dtype() != col.get_dtype()) throw std::runtime_error("index dtype must match row/col dtype");
@@ -96,7 +102,8 @@ namespace maelstrom {
                 rel_types,
                 return_inner,
                 return_values,
-                return_relations
+                return_relations,
+                return_1d_index_as_values
             );
 
         }

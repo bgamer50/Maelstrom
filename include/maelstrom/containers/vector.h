@@ -75,7 +75,17 @@ namespace maelstrom {
                 return this->insert(ix_start, new_elements, 0, new_elements.size());
             }
 
-            inline void erase(){} // single erase, range erase
+            /*
+                At the end of this vector, add all elements in the given vector.
+            */
+            inline void insert(vector& new_elements) {
+                return this->insert(this->size(), new_elements, 0, new_elements.size());
+            }
+
+            /*
+                Erases the element at the given index.
+            */
+            void erase(size_t i);
             
             /*
                 Gets the value at the given index.

@@ -46,6 +46,7 @@ namespace maelstrom {
             maelstrom::dtype_t val_dtype;
 
         public:
+
             hash_table(maelstrom::storage mem_type, maelstrom::dtype_t key_dtype, maelstrom::dtype_t val_dtype, size_t initial_size=62);
 
             ~hash_table() noexcept(false);

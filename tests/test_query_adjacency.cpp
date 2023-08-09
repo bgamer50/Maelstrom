@@ -11,6 +11,8 @@ void test_query_adjacency_basic_device();
 void test_query_adjacency_basic_host();
 void test_query_adjacency_reltypes_device();
 void test_query_adjacency_reltypes_host();
+void test_query_adjacency_index_device();
+void test_query_adjacency_index_host();
 
 int main(int argc, char* argv[]) {
     try {
@@ -18,6 +20,8 @@ int main(int argc, char* argv[]) {
         test_query_adjacency_basic_host();
         test_query_adjacency_reltypes_device();
         test_query_adjacency_reltypes_host();
+        test_query_adjacency_index_device();
+        test_query_adjacency_index_host();
     } catch(std::exception& err) {
         std::cerr << "FAIL!" << std::endl;
         std::cerr << err.what() << std::endl;
@@ -410,5 +414,195 @@ void test_query_adjacency_reltypes_host() {
 
     assert_array_equals(static_cast<size_t*>(origin.data()), expected_origin.data(), expected_origin.size());
     assert_array_equals(static_cast<uint8_t*>(r_rel.data()), expected_rel.data(), expected_rel.size());
+    assert_array_equals(static_cast<int32_t*>(inner.data()), expected_inner.data(), expected_inner.size());
+}
+
+void test_query_adjacency_index_host() {
+    /*
+    0  1  0  1  0  0
+    1  0  1  0  1  1
+    1  0  0  0  0  0
+    0  1  1  0  0  0
+    0  1  1  1  1  0
+    1  0  1  0  0  1
+    */
+    std::vector<int> row = {0, 2, 6, 7, 9, 13, 16};
+    std::vector<int> col = {1, 3, 0, 2, 4, 5, 0, 1, 2, 1, 2, 3, 4, 0, 2, 5};
+    std::vector<uint8_t> rel = {(uint8_t)1, (uint8_t)2, (uint8_t)0, (uint8_t)2, (uint8_t)4, (uint8_t)2, (uint8_t)0, (uint8_t)1, (uint8_t)2, (uint8_t)1, (uint8_t)2, (uint8_t)3, (uint8_t)4, (uint8_t)0, (uint8_t)4, (uint8_t)4};
+    std::vector<double> val = {0.0, 0.1, 0.3, 0.8, 0.9, 1.2, 3.2, 4.4, 6.8, 0.3, 0.4, 0.5, 0.6, 0.7, 0.11, 3.3};
+
+    assert(val.size() == rel.size());
+
+    maelstrom::vector m_row(
+        maelstrom::HOST,
+        maelstrom::int32,
+        row.data(),
+        row.size(),
+        false
+    );
+
+    maelstrom::vector m_col(
+        maelstrom::HOST,
+        maelstrom::int32,
+        col.data(),
+        col.size(),
+        false
+    );
+
+    maelstrom::vector m_rel(
+        maelstrom::HOST,
+        maelstrom::uint8,
+        rel.data(),
+        rel.size(),
+        false
+    );
+
+    maelstrom::vector m_val(
+        maelstrom::HOST,
+        maelstrom::float64,
+        val.data(),
+        val.size(),
+        false
+    );
+
+    std::vector<int> ix = {1, 1, 3, 3, 4, 5};
+    maelstrom::vector m_ix(
+        maelstrom::HOST,
+        maelstrom::int32,
+        ix.data(),
+        ix.size(),
+        false
+    );
+
+    std::vector<uint8_t> reltypes = {(uint8_t)0, (uint8_t)2};
+    maelstrom::vector m_reltypes(
+        maelstrom::HOST,
+        maelstrom::uint8,
+        reltypes.data(),
+        reltypes.size(),
+        false
+    );
+    
+    maelstrom::vector empty_vec;
+    maelstrom::vector origin;
+    maelstrom::vector inner;
+    maelstrom::vector r_rel;
+    maelstrom::vector r_val;
+    std::tie(origin, inner, r_val, r_rel) = maelstrom::sparse::query_adjacency(
+        m_row,
+        m_col,
+        empty_vec,
+        m_rel,
+        m_ix,
+        m_reltypes,
+        true,
+        true,
+        true,
+        true
+    );
+
+    std::vector<size_t> expected_origin = {(size_t)0, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)2, (size_t)3, (size_t)4, (size_t)5};
+    std::vector<uint8_t> expected_rel = {(uint8_t)0, (uint8_t)2, (uint8_t)2, (uint8_t)0, (uint8_t)2, (uint8_t)2, (uint8_t)2, (uint8_t)2, (uint8_t)2, (uint8_t)0};
+    std::vector<int32_t> expected_val = {(int32_t)2, (int32_t)3, (int32_t)5, (int32_t)2, (int32_t)3, (int32_t)5, (int32_t)8, (int32_t)8, (int32_t)10, (int32_t)13};
+    std::vector<int32_t> expected_inner = {(int32_t)0, (int32_t)2, (int32_t)5, (int32_t)0, (int32_t)2, (int32_t)5, (int32_t)2, (int32_t)2, (int32_t)2, (int32_t)0};
+
+    assert_array_equals(static_cast<size_t*>(origin.data()), expected_origin.data(), expected_origin.size());
+    assert_array_equals(static_cast<uint8_t*>(r_rel.data()), expected_rel.data(), expected_rel.size());
+    assert_array_equals(static_cast<int32_t*>(r_val.data()), expected_val.data(), expected_val.size());
+    assert_array_equals(static_cast<int32_t*>(inner.data()), expected_inner.data(), expected_inner.size());
+}
+
+void test_query_adjacency_index_device() {
+    /*
+    0  1  0  1  0  0
+    1  0  1  0  1  1
+    1  0  0  0  0  0
+    0  1  1  0  0  0
+    0  1  1  1  1  0
+    1  0  1  0  0  1
+    */
+    std::vector<int> row = {0, 2, 6, 7, 9, 13, 16};
+    std::vector<int> col = {1, 3, 0, 2, 4, 5, 0, 1, 2, 1, 2, 3, 4, 0, 2, 5};
+    std::vector<uint8_t> rel = {(uint8_t)1, (uint8_t)2, (uint8_t)0, (uint8_t)2, (uint8_t)4, (uint8_t)2, (uint8_t)0, (uint8_t)1, (uint8_t)2, (uint8_t)1, (uint8_t)2, (uint8_t)3, (uint8_t)4, (uint8_t)0, (uint8_t)4, (uint8_t)4};
+    std::vector<double> val = {0.0, 0.1, 0.3, 0.8, 0.9, 1.2, 3.2, 4.4, 6.8, 0.3, 0.4, 0.5, 0.6, 0.7, 0.11, 3.3};
+
+    assert(val.size() == rel.size());
+
+    maelstrom::vector m_row(
+        maelstrom::MANAGED,
+        maelstrom::int32,
+        row.data(),
+        row.size(),
+        false
+    );
+
+    maelstrom::vector m_col(
+        maelstrom::MANAGED,
+        maelstrom::int32,
+        col.data(),
+        col.size(),
+        false
+    );
+
+    maelstrom::vector m_rel(
+        maelstrom::MANAGED,
+        maelstrom::uint8,
+        rel.data(),
+        rel.size(),
+        false
+    );
+
+    maelstrom::vector m_val(
+        maelstrom::MANAGED,
+        maelstrom::float64,
+        val.data(),
+        val.size(),
+        false
+    );
+
+    std::vector<int> ix = {1, 1, 3, 3, 4, 5};
+    maelstrom::vector m_ix(
+        maelstrom::MANAGED,
+        maelstrom::int32,
+        ix.data(),
+        ix.size(),
+        false
+    );
+
+    std::vector<uint8_t> reltypes = {(uint8_t)0, (uint8_t)2};
+    maelstrom::vector m_reltypes(
+        maelstrom::MANAGED,
+        maelstrom::uint8,
+        reltypes.data(),
+        reltypes.size(),
+        false
+    );
+    
+    maelstrom::vector empty_vec;
+    maelstrom::vector origin;
+    maelstrom::vector inner;
+    maelstrom::vector r_rel;
+    maelstrom::vector r_val;
+    std::tie(origin, inner, r_val, r_rel) = maelstrom::sparse::query_adjacency(
+        m_row,
+        m_col,
+        empty_vec,
+        m_rel,
+        m_ix,
+        m_reltypes,
+        true,
+        true,
+        true,
+        true
+    );
+
+    std::vector<size_t> expected_origin = {(size_t)0, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)2, (size_t)3, (size_t)4, (size_t)5};
+    std::vector<uint8_t> expected_rel = {(uint8_t)0, (uint8_t)2, (uint8_t)2, (uint8_t)0, (uint8_t)2, (uint8_t)2, (uint8_t)2, (uint8_t)2, (uint8_t)2, (uint8_t)0};
+    std::vector<int32_t> expected_val = {(int32_t)2, (int32_t)3, (int32_t)5, (int32_t)2, (int32_t)3, (int32_t)5, (int32_t)8, (int32_t)8, (int32_t)10, (int32_t)13};
+    std::vector<int32_t> expected_inner = {(int32_t)0, (int32_t)2, (int32_t)5, (int32_t)0, (int32_t)2, (int32_t)5, (int32_t)2, (int32_t)2, (int32_t)2, (int32_t)0};
+
+    assert_array_equals(static_cast<size_t*>(origin.data()), expected_origin.data(), expected_origin.size());
+    assert_array_equals(static_cast<uint8_t*>(r_rel.data()), expected_rel.data(), expected_rel.size());
+    assert_array_equals(static_cast<int32_t*>(r_val.data()), expected_val.data(), expected_val.size());
     assert_array_equals(static_cast<int32_t*>(inner.data()), expected_inner.data(), expected_inner.size());
 }

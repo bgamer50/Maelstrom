@@ -24,7 +24,8 @@ namespace maelstrom {
                                                                                                                maelstrom::vector& rel_types,
                                                                                                                bool return_inner=true,
                                                                                                                bool return_values=false,
-                                                                                                               bool return_relations=false);
+                                                                                                               bool return_relations=false,
+                                                                                                               bool return_1d_index_as_values=false);
 
     }
 }

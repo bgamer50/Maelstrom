@@ -118,7 +118,7 @@ namespace maelstrom {
         );
     }
 
-    std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> basic_sparse_matrix::query_adjacency(maelstrom::vector& ix, maelstrom::vector& rel_types, bool return_inner, bool return_values, bool return_relations) {
+    std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> basic_sparse_matrix::query_adjacency(maelstrom::vector& ix, maelstrom::vector& rel_types, bool return_inner, bool return_values, bool return_relations, bool return_1d_index_as_values) {
         // sorting is not required
 
         if(this->format == CSR) {
@@ -131,7 +131,8 @@ namespace maelstrom {
                 rel_types,
                 return_inner,
                 return_values,
-                return_relations
+                return_relations,
+                return_1d_index_as_values
             );
         } else if(this->format == CSC) {
             return maelstrom::sparse::query_adjacency(
@@ -143,7 +144,8 @@ namespace maelstrom {
                 rel_types,
                 return_inner,
                 return_values,
-                return_relations
+                return_relations,
+                return_1d_index_as_values
             );
         }
 
@@ -157,13 +159,15 @@ namespace maelstrom {
         if(!new_vals.empty() && new_vals.size() != new_rows.size()) throw std::runtime_error("new vals size must match new rows size");
         if(!new_rels.empty() && new_rels.size() != new_rows.size()) throw std::runtime_error("new rels size must match new rows size");
 
-        if(new_vals.empty() && !this->val.empty()) throw std::runtime_error("values must be inserted since this matrix has values");
-        if(new_rels.empty() && !this->rel.empty()) throw std::runtime_error("relations must be inserted since this matrix has values");
+        bool new_edges = !new_rows.empty();
+
+        if(new_edges && new_vals.empty() && !this->val.empty()) throw std::runtime_error("values must be inserted since this matrix has values");
+        if(new_edges && new_rels.empty() && !this->rel.empty()) throw std::runtime_error("relations must be inserted since this matrix has relations");
 
         this->n_rows = new_num_rows;
         this->n_cols = new_num_cols;
 
-        if(new_rows.empty()) return;
+        if(!new_edges) return;
 
         this->row.insert(
             this->row.size(),

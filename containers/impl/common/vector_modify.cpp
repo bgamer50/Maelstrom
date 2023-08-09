@@ -29,6 +29,10 @@ namespace maelstrom {
     }
 
     void vector::insert(size_t ix_start, vector& new_elements, size_t add_ix_start, size_t add_ix_end) {
+        if(new_elements.filled_size == 0) {
+            if(add_ix_end - add_ix_start > 0) throw std::runtime_error("Invalid range in new elements (empty vector)");
+            else return;
+        }
         if(this->view) throw std::runtime_error("Cannot insert into a view!");
         if(this->data_ptr == new_elements.data_ptr) throw std::runtime_error("Inserted vector cannot be same vector!");
 

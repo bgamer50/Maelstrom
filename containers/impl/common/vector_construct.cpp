@@ -141,7 +141,7 @@ namespace maelstrom {
     }
 
     vector make_vector_from_anys(maelstrom::storage mem_type, maelstrom::dtype_t dtype, std::vector<std::any>& anys) {
-        if(anys.empty()) return maelstrom::vector(mem_type, maelstrom::default_dtype);
+        if(anys.empty()) return maelstrom::vector(mem_type, dtype);
 
         std::vector<unsigned char> bytes;
         bytes.reserve(anys.size() * maelstrom::size_of(dtype));
