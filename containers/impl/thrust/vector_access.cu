@@ -48,8 +48,12 @@ namespace maelstrom {
         auto erase_ptr = static_cast<unsigned char*>(this->data_ptr) + (data_size * (i+1));
         auto new_data = static_cast<unsigned char*>(this->alloc(this->reserved_size));
 
-        this->copy(this->data_ptr, new_data, i-1);
-        this->copy(erase_ptr, new_data + (data_size * i), this->filled_size - i - 1);
+        if(i > 0) {
+            this->copy(this->data_ptr, new_data, i-1);
+        }
+        if(i < this->filled_size - 1) {
+            this->copy(erase_ptr, new_data + (data_size * i), this->filled_size - i - 1);
+        }
 
         this->dealloc(this->data_ptr);
         this->data_ptr = new_data;

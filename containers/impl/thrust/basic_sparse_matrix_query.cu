@@ -10,7 +10,7 @@
 #include "maelstrom/algorithms/sparse/query_adjacency.h"
 #include "maelstrom/algorithms/sparse/search_sorted_sparse.h"
 
-#include "maelstrom/util/any_utils.cuh"
+#include "maelstrom/util/any_utils.h"
 
 namespace maelstrom {
 

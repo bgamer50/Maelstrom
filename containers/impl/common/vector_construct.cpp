@@ -69,9 +69,12 @@ namespace maelstrom {
         this->filled_size = orig.filled_size;
         this->reserved_size = 0;
         this->view = false;
+        this->data_ptr = nullptr;
 
-        this->resize(orig.filled_size);
-        this->copy(orig.data_ptr, this->data_ptr, orig.filled_size);                    
+        if(this->filled_size > 0) {
+            this->resize(orig.filled_size);
+            this->copy(orig.data_ptr, this->data_ptr, orig.filled_size);                    
+        }
     }
 
     vector::vector(vector&& other) noexcept {
@@ -127,7 +130,10 @@ namespace maelstrom {
             return *this;
         }
 
-        this->dealloc(this->data_ptr);
+        if(!this->view) {
+            this->clear();
+        }
+
         this->mem_type = other.mem_type;
         this->dtype = other.dtype;
         this->view = other.view;

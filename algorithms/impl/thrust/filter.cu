@@ -1,6 +1,7 @@
 #include "maelstrom/algorithms/filter.h"
 #include "maelstrom/thrust_utils/thrust_utils.cuh"
 #include "maelstrom/thrust_utils/thrust_comparison.cuh"
+#include "maelstrom/util/any_utils.h"
 
 #include <sstream>
 
@@ -8,6 +9,8 @@ namespace maelstrom {
 
     template <typename E, typename T>
     maelstrom::vector t_filter(E exec_policy, maelstrom::vector& vec, maelstrom::comparator cmp, std::any cmp_val) {
+        cmp_val = maelstrom::safe_any_cast(cmp_val, vec.get_dtype());
+
         maelstrom::vector indices(
             vec.get_mem_type(),
             maelstrom::uint64,
@@ -18,8 +21,6 @@ namespace maelstrom {
             std::stringstream sx;
             sx << "Comparator " << cmp << " is currently unsupported for filter()";
             throw std::runtime_error(sx.str());
-        } else {
-            if(maelstrom::prim_type_of(cmp_val) != vec.get_dtype().prim_type) throw std::runtime_error("Type of cmp value does not match vector primitive type");
         }
 
         auto end = thrust::copy_if(

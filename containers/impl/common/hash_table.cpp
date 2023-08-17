@@ -1,5 +1,7 @@
 #include "maelstrom/containers/hash_table.h"
 
+#include <sstream>
+
 namespace maelstrom {
 
     hash_table::hash_table(maelstrom::storage mem_type, maelstrom::dtype_t key_dtype, maelstrom::dtype_t val_dtype, size_t initial_size) {
@@ -40,12 +42,22 @@ namespace maelstrom {
 
     void hash_table::set(maelstrom::vector& keys, maelstrom::vector& vals) {
         if(this->mem_type == HOST && (keys.get_mem_type() == DEVICE || vals.get_mem_type() == DEVICE)) {
-            throw std::runtime_error("can't use device array to set host hash table");
+            throw std::invalid_argument("can't use device array to set host hash table");
         }
 
-        if(keys.get_dtype() != this->key_dtype) throw std::runtime_error("key dtype must match!");
-        if(vals.get_dtype() != this->val_dtype) throw std::runtime_error("val dtype must match!");
-        if(keys.size() != vals.size()) throw std::runtime_error("number of keys must match number of values for insert!");
+        if(keys.get_dtype() != this->key_dtype) {
+            std::stringstream sx;
+            sx << "key dtype must match! (got " << keys.get_dtype().name << " but expected " << this->key_dtype.name << ")";
+            throw std::invalid_argument(sx.str());
+        } 
+        
+        if(vals.get_dtype() != this->val_dtype) {
+            std::stringstream sx;
+            sx << "val dtype must match! (got " << vals.get_dtype().name << " but expected " << this->val_dtype.name << ")";
+            throw std::invalid_argument(sx.str());
+        }
+
+        if(keys.size() != vals.size()) throw std::invalid_argument("number of keys must match number of values for insert!");
 
         switch(this->mem_type) {
             case HOST:

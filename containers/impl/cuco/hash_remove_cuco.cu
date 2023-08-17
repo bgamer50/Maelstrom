@@ -36,7 +36,10 @@ namespace maelstrom {
                 return cuco_remove_hash_table<A, K, float>(data, keys, value_dtype);
             case UINT8:
             case INT8:
-                throw std::runtime_error("single-byte values are currently immutable in device hash tables!");
+                throw std::invalid_argument(
+                    "single-byte values are not supported in device/managed hash tables, "
+                    "consider using a host hash table instead."
+                );
         }
 
         throw std::runtime_error("invalid value type for hash table (insert)");

@@ -1,6 +1,5 @@
 #include "maelstrom/containers/vector.h"
 #include "maelstrom/algorithms/cast.h"
-#include <iostream>
 
 namespace maelstrom {
     
@@ -33,6 +32,7 @@ namespace maelstrom {
             if(add_ix_end - add_ix_start > 0) throw std::runtime_error("Invalid range in new elements (empty vector)");
             else return;
         }
+
         if(this->view) throw std::runtime_error("Cannot insert into a view!");
         if(this->data_ptr == new_elements.data_ptr) throw std::runtime_error("Inserted vector cannot be same vector!");
 
@@ -76,7 +76,9 @@ namespace maelstrom {
                 );
             }
 
-            this->dealloc(this->data_ptr);
+            if(this->data_ptr != nullptr) {
+                this->dealloc(this->data_ptr);
+            }
             this->data_ptr = new_data;
         }
 

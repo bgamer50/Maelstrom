@@ -20,18 +20,20 @@ namespace maelstrom {
                 return cuco_destroy_hash_table<A, K, uint64_t>(data);
             case UINT32:
                 return cuco_destroy_hash_table<A, K, uint32_t>(data);
-            case UINT8:
-                return cuco_destroy_hash_table<A, K, uint8_t>(data);
             case INT64:
                 return cuco_destroy_hash_table<A, K, int64_t>(data);
             case INT32:
                 return cuco_destroy_hash_table<A, K, int32_t>(data);
-            case INT8:
-                return cuco_destroy_hash_table<A, K, int8_t>(data);
             case FLOAT64:
                 return cuco_destroy_hash_table<A, K, double>(data);
             case FLOAT32:
                 return cuco_destroy_hash_table<A, K, float>(data);
+            case UINT8:
+            case INT8:
+                throw std::invalid_argument(
+                    "single-byte values are not supported in device/managed hash tables, "
+                    "consider using a host hash table instead."
+                );
         }
 
         throw std::runtime_error("invalid dtype for hash table (destroy)");

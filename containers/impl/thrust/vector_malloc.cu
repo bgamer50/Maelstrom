@@ -49,6 +49,8 @@ namespace maelstrom {
     }
 
     void maelstrom::vector::dealloc(void* ptr) {
+        if(ptr == nullptr) throw std::invalid_argument("Cannot deallocate a null pointer");
+
         switch(this->mem_type) {
             case HOST: {
                 cudaFree(ptr);
@@ -93,7 +95,7 @@ namespace maelstrom {
 
         cudaMemcpy(dst, src, maelstrom::size_of(this->dtype) * size, cudaMemcpyDefault);
         cudaDeviceSynchronize();
-        maelstrom::cuda::cudaCheckErrors("TypeErasedVector copy");
+        maelstrom::cuda::cudaCheckErrors("maelstrom vector copy");
     }
 
 }

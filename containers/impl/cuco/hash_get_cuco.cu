@@ -52,18 +52,20 @@ namespace maelstrom {
                 return cuco_get_hash_table<A, K, uint64_t>(data, keys, value_type, return_values);
             case UINT32:
                 return cuco_get_hash_table<A, K, uint32_t>(data, keys, value_type, return_values);
-            case UINT8:
-                return cuco_get_hash_table<A, K, uint8_t>(data, keys, value_type, return_values);
             case INT64:
                 return cuco_get_hash_table<A, K, int64_t>(data, keys, value_type, return_values);
             case INT32:
                 return cuco_get_hash_table<A, K, int32_t>(data, keys, value_type, return_values);
-            case INT8:
-                return cuco_get_hash_table<A, K, int8_t>(data, keys, value_type, return_values);
             case FLOAT64:
                 return cuco_get_hash_table<A, K, double>(data, keys, value_type, return_values);
             case FLOAT32:
                 return cuco_get_hash_table<A, K, float>(data, keys, value_type, return_values);
+            case UINT8:
+            case INT8:
+                throw std::invalid_argument(
+                    "single-byte values are not supported in device/managed hash tables, "
+                    "consider using a host hash table instead."
+                );
         }
 
         throw std::runtime_error("invalid value type for hash table (insert)");

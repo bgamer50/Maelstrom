@@ -2,7 +2,7 @@
 
 #include "maelstrom/thrust_utils/thrust_utils.cuh"
 #include "maelstrom/thrust_utils/execution.cuh"
-#include "maelstrom/util/any_utils.cuh"
+#include "maelstrom/util/any_utils.h"
 
 namespace maelstrom {
 

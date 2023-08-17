@@ -28,18 +28,20 @@ namespace maelstrom {
                 return cuco_instantiate_hash_table_device<A, K, uint64_t>(initial_size);
             case UINT32:
                 return cuco_instantiate_hash_table_device<A, K, uint32_t>(initial_size);
-            case UINT8:
-                return cuco_instantiate_hash_table_device<A, K, uint8_t>(initial_size);
             case INT64:
                 return cuco_instantiate_hash_table_device<A, K, int64_t>(initial_size);
             case INT32:
                 return cuco_instantiate_hash_table_device<A, K, int32_t>(initial_size);
-            case INT8:
-                return cuco_instantiate_hash_table_device<A, K, int8_t>(initial_size);
             case FLOAT64:
                 return cuco_instantiate_hash_table_device<A, K, double>(initial_size);
             case FLOAT32:
                 return cuco_instantiate_hash_table_device<A, K, float>(initial_size);
+            case UINT8:
+            case INT8:
+                throw std::invalid_argument(
+                    "single-byte values are not supported in device/managed hash tables, "
+                    "consider using a host hash table instead."
+                );
         }
 
         throw std::runtime_error("illegal value type for device hash table");

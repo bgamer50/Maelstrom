@@ -1,5 +1,5 @@
 #include "maelstrom/containers/vector.h"
-#include "maelstrom/util/any_utils.cuh"
+#include "maelstrom/util/any_utils.h"
 #include <limits>
 
 namespace maelstrom {
