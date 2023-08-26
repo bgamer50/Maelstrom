@@ -89,7 +89,8 @@ namespace maelstrom {
             if(ix.get_dtype() != col.get_dtype()) throw std::runtime_error("index dtype must match row/col dtype");
 
             if(row.get_mem_type() != col.get_mem_type()) throw std::runtime_error("row and col must have the same memory type");
-            if(ix.get_mem_type() != col.get_mem_type()) throw std::runtime_error("index must have the same memory type as row/col");
+            //if(ix.get_mem_type() != col.get_mem_type()) throw std::runtime_error("index must have the same memory type as row/col");
+            // TODO do better checking here
 
             if(!rel_types.empty() && rel_types.get_dtype() != rel.get_dtype()) throw std::runtime_error("query relation dtype must match relation dtype");
             

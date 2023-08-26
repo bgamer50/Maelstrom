@@ -124,12 +124,15 @@ namespace maelstrom {
 
     void remove_if(maelstrom::vector& array, maelstrom::vector& stencil) {
         // Error checking
+        // TODO properly check this
+        /*
         if(array.get_mem_type() != stencil.get_mem_type()) {
             std::stringstream sx;
             sx << "Memory type of array (" << array.get_mem_type() << ")";
             sx << " does not match memory type of stencil (" << stencil.get_mem_type() << ")";
             throw std::runtime_error(sx.str());
         }
+        */
 
         std::any exec_policy = maelstrom::get_execution_policy(array).get();
         const std::type_info& t = exec_policy.type();

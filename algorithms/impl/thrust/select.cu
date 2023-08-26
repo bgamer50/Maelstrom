@@ -72,12 +72,15 @@ namespace maelstrom {
 
     maelstrom::vector select(maelstrom::vector& vec, maelstrom::vector& idx) {
         // Error checking
+        // TODO do this properly
+        /*
         if(vec.get_mem_type() != idx.get_mem_type()) {
             std::stringstream sx;
             sx << "Memory type of array (" << vec.get_mem_type() << ")";
             sx << " does not match memory type of index (" << idx.get_mem_type() << ")";
             throw std::runtime_error(sx.str());
         }
+        */
 
         std::any exec_policy = maelstrom::get_execution_policy(vec).get();
         const std::type_info& t = exec_policy.type();
