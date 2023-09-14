@@ -154,7 +154,7 @@ namespace maelstrom {
         for(size_t k = 0; k < anys.size(); ++k) {
             std::vector<unsigned char> bytes_k;
             maelstrom::primitive_t prim_k;
-            std::tie(bytes, prim_k) = maelstrom::any_to_bytes(anys[k]);
+            std::tie(bytes_k, prim_k) = maelstrom::any_to_bytes(anys[k]);
             
             if(prim_k != dtype.prim_type) {
                 std::stringstream sx;

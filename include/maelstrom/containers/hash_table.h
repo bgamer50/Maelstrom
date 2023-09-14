@@ -63,6 +63,12 @@ namespace maelstrom {
 
             inline std::any val_not_found() { return maelstrom::max_value(this->val_dtype); }
 
+            inline maelstrom::storage get_mem_type() { return this->mem_type; }
+
+            inline maelstrom::dtype_t get_key_dtype() { return this->key_dtype; }
+
+            inline maelstrom::dtype_t get_val_dtype() { return this->val_dtype; }
+
     };
 
 }

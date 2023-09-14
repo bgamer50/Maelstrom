@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iostream>
 #include <unordered_set>
+#include <type_traits>
 
 namespace maelstrom {
 
@@ -52,7 +53,7 @@ namespace maelstrom {
             }
 
             inline std::string decode(T repr) {
-                if(repr < 0 || repr > this->repr_to_str.size()) {
+                if((std::is_signed_v<T> && repr < 0) || repr > this->repr_to_str.size()) {
                     std::stringstream sx;
                     sx << "No string exists with given representation: " << repr;
                     throw std::runtime_error(sx.str());
