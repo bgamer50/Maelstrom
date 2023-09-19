@@ -38,9 +38,11 @@ namespace maelstrom {
         if(this->format != COO) throw std::runtime_error("Sorting by values is only valid for COO matrices!");
 
         auto sorted_ix = maelstrom::sort(this->val);
-        maelstrom::select(this->row, sorted_ix);
-        maelstrom::select(this->col, sorted_ix);
-        maelstrom::select(this->rel, sorted_ix);
+        this->row = std::move(maelstrom::select(this->row, sorted_ix));
+        this->col = std::move(maelstrom::select(this->col, sorted_ix));
+        if(this->has_relations()) {
+            this->rel = std::move(maelstrom::select(this->rel, sorted_ix));
+        }
 
         this->sorted = false;
         return return_perm ? sorted_ix : maelstrom::vector();

@@ -1,4 +1,5 @@
 #include "maelstrom/containers/vector.h"
+#include "maelstrom/algorithms/arange.h"
 #include "maelstrom/thrust_utils/execution.cuh"
 #include "maelstrom/thrust_utils/thrust_utils.cuh"
 
@@ -6,18 +7,7 @@ namespace maelstrom {
 
     template <typename E, typename T1, typename T2, typename T3>
     maelstrom::vector t_sort_uint_index(E exec_policy, std::vector<std::reference_wrapper<maelstrom::vector>> vectors) {
-        maelstrom::vector sorted_indices(
-            vectors.front().get().get_mem_type(),
-            uint64,
-            vectors.front().get().size()
-        );
-
-        thrust::copy(
-            exec_policy,
-            thrust::make_counting_iterator(static_cast<size_t>(0)),
-            thrust::make_counting_iterator(static_cast<size_t>(0)) + vectors.front().get().size(),
-            maelstrom::device_tptr_cast<size_t>(sorted_indices.data())
-        );
+        auto sorted_indices = maelstrom::arange(vectors.front().get().get_mem_type(), vectors.front().get().size());
 
         switch(vectors.size()) {
             case 0:
