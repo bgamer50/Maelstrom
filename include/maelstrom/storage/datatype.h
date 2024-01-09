@@ -3,6 +3,7 @@
 #include <any>
 #include <functional>
 #include <string>
+#include <unordered_map>
 
 namespace maelstrom {
     enum primitive_t {UINT64=0, UINT32=1, INT64=2, INT32=3, FLOAT64=4, FLOAT32=5, UINT8=6, INT8=7};
@@ -39,4 +40,9 @@ namespace maelstrom {
     extern dtype_t float32;
 
     extern dtype_t default_dtype;
+
+    /*
+        Mapping of the default data types from strings
+    */
+    extern std::unordered_map<std::string, dtype_t> dtype_string_mapping;
 }

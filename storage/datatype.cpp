@@ -1,4 +1,5 @@
 #include "maelstrom/storage/datatype.h"
+#include "maelstrom/storage/storage.h"
 #include <limits>
 #include <cstdint>
 #include <stdexcept>
@@ -202,4 +203,22 @@ namespace maelstrom {
     };
 
     dtype_t default_dtype = float64;
+
+    std::unordered_map<std::string, dtype_t> dtype_string_mapping = {
+        {uint64.name, uint64},
+        {uint32.name, uint32},
+        {uint8.name, uint8},
+        {int64.name, int64},
+        {int32.name, int32},
+        {int8.name, int8},
+        {float64.name, float64},
+        {float32.name, float32}
+    };
+
+    std::unordered_map<std::string, maelstrom::storage> storage_string_mapping = {
+        {"HOST", storage::HOST},
+        {"DEVICE", storage::DEVICE},
+        {"MANAGED", storage::MANAGED},
+        {"PINNED", storage::PINNED}
+    };
 }
