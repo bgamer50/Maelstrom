@@ -56,6 +56,8 @@ namespace maelstrom {
 
             vector& operator=(vector& other) noexcept;
 
+            inline bool is_dist() { return maelstrom::is_dist(this->mem_type); }
+
             inline bool is_view() { return this->view; }
 
             void push_back();
