@@ -38,6 +38,7 @@ namespace maelstrom {
         this->dtype = dtype;
         this->view = view;
         this->reserved_size = 0;
+        this->filled_size = 0;
 
         if(this->view) { 
             this->data_ptr = data; 

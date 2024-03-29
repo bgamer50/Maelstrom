@@ -6,6 +6,8 @@ project(
     LANGUAGES CXX CUDA
 )
 
+find_package(MPI REQUIRED)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CUDA_FLAGS "-forward-unknown-to-host-compiler --expt-relaxed-constexpr --expt-extended-lambda")
@@ -26,6 +28,7 @@ add_library(
     containers/impl/common/hash_table.cpp
     storage/datatype.cpp
     storage/strings.cpp
+    storage/dist.cpp
     algorithms/impl/common/unpack.cpp
     algorithms/impl/host/search_sorted_host.cpp
     algorithms/impl/host/query_adjacency_host.cpp
@@ -35,6 +38,7 @@ add_library(
     # thrust/cuda
     containers/impl/thrust/vector_malloc.cu
     containers/impl/thrust/vector_access.cu
+    containers/impl/thrust/vector_query.cu
     containers/impl/thrust/basic_sparse_matrix_convert.cu
     containers/impl/thrust/basic_sparse_matrix_query.cu
     containers/impl/cuco/hash_construct_cuco.cu
@@ -68,7 +72,10 @@ add_library(
     algorithms/impl/thrust/csr_to_coo.cu
     algorithms/impl/thrust/prefix_sum.cu
     algorithms/impl/thrust/assign.cu
+    algorithms/impl/thrust/assign_dist.cu
     algorithms/impl/thrust/sort_uint_index.cu
+    algorithms/impl/thrust/rebalance.cu
+    algorithms/impl/thrust/shuffle.cu
     algorithms/impl/cuda/search_sorted_device.cu
     algorithms/impl/cuda/query_adjacency_device.cu
     algorithms/impl/cuda/search_sorted_sparse_device.cu
@@ -106,6 +113,8 @@ target_include_directories(
 target_link_libraries(
     maelstrom
         cuco
+        nccl
+        MPI::MPI_CXX
 )
 
 function(AddMaelstromTest EXEC_NAME)
@@ -122,6 +131,32 @@ function(AddMaelstromTest EXEC_NAME)
         ${EXEC_NAME}
         PRIVATE
             "tests/"
+            "tests/dist/"
+    )
+
+    target_link_libraries(
+        ${EXEC_NAME}
+        PRIVATE
+            maelstrom  
+    )
+
+endfunction()
+
+function(AddMaelstromDistTest EXEC_NAME)
+
+    add_executable(${EXEC_NAME} ${ARGN})
+
+    set_target_properties(
+        ${EXEC_NAME}
+        PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "test/bin/dist"
+    )
+
+    target_include_directories(
+        ${EXEC_NAME}
+        PRIVATE
+            "tests/"
+            "tests/dist/"
     )
 
     target_link_libraries(
@@ -157,3 +192,10 @@ AddMaelstromTest(test_csr_to_coo.exe tests/test_csr_to_coo.cpp)
 AddMaelstromTest(test_prefix_sum.exe tests/test_prefix_sum.cpp)
 AddMaelstromTest(test_hash_table.exe tests/test_hash_table.cpp)
 AddMaelstromTest(test_assign.exe tests/test_assign.cpp)
+
+AddMaelstromDistTest(test_dist_init.exe tests/dist/test_dist_init.cu)
+AddMaelstromDistTest(test_dist_arange.exe tests/dist/test_dist_arange.cu)
+AddMaelstromDistTest(test_dist_shuffle.exe tests/dist/test_dist_shuffle.cu)
+AddMaelstromDistTest(test_dist_rebalance.exe tests/dist/test_dist_rebalance.cu)
+AddMaelstromDistTest(test_dist_set.exe tests/dist/test_dist_set.cu)
+AddMaelstromDistTest(test_dist_assign.exe tests/dist/test_dist_assign.cu)

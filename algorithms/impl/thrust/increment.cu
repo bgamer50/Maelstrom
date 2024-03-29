@@ -91,8 +91,8 @@ namespace maelstrom {
     }
 
     void increment(maelstrom::vector& vec, std::any inc, size_t start, size_t end, maelstrom::inc_op op) {
-        if(start > vec.size() - 1) throw std::runtime_error("Start out of range!");
-        if(end > vec.size()) throw std::runtime_error("End out of range!");
+        if(start > vec.local_size() - 1) throw std::runtime_error("Start out of range!");
+        if(end > vec.local_size()) throw std::runtime_error("End out of range!");
 
         increment_dispatch_exec_policy(vec, inc, start, end, op);
     }

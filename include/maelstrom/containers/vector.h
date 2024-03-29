@@ -63,12 +63,14 @@ namespace maelstrom {
             void push_back();
 
             void reserve(size_t N);
+            void reserve_local(size_t N);
 
             /*
                 At position ix_start in this vector, adds the elements in the given vector
                 in the range [add_ix_start, add_ix_end).
             */
             void insert(size_t ix_start, vector& new_elements, size_t add_ix_start, size_t add_ix_end);
+            void insert_local(size_t ix_start, vector& new_elements, size_t add_ix_start, size_t add_ix_end);
 
             /*
                 At position ix_start in this vector, add all elements in the given vector.
@@ -76,12 +78,18 @@ namespace maelstrom {
             inline void insert(size_t ix_start, vector& new_elements) {
                 return this->insert(ix_start, new_elements, 0, new_elements.size());
             }
+            inline void insert_local(size_t ix_start, vector& new_elements) {
+                return this->insert_local(ix_start, new_elements, 0, new_elements.size());
+            }
 
             /*
                 At the end of this vector, add all elements in the given vector.
             */
             inline void insert(vector& new_elements) {
                 return this->insert(this->size(), new_elements, 0, new_elements.size());
+            }
+            inline void insert_local(vector& new_elements) {
+                return this->insert_local(this->size(), new_elements, 0, new_elements.size());
             }
 
             /*
@@ -95,6 +103,11 @@ namespace maelstrom {
             std::any get(size_t i);
 
             /*
+                Gets the value at the given local index.
+            */
+            std::any get_local(size_t i);
+
+            /*
                 Empties the contents of this vector and frees any reserved memory.
             */
             void clear();
@@ -104,9 +117,11 @@ namespace maelstrom {
             */
             void print();
             
-            inline size_t size() { return this->filled_size; }
+            size_t size();
 
-            inline bool empty() { return this->filled_size == 0; }
+            inline size_t local_size() { return this->filled_size; }
+
+            inline bool empty() { return this->data_ptr == nullptr || this->size() == 0; }
 
             inline void* data() {
                 return this->data_ptr;
@@ -134,6 +149,7 @@ namespace maelstrom {
             }
 
             void resize(size_t N);
+            void resize_local(size_t N);
 
             void shrink_to_fit();
 

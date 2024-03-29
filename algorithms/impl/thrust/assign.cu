@@ -4,6 +4,8 @@
 
 namespace maelstrom {
 
+    extern void assign_dispatch_dist(maelstrom::vector& dst, maelstrom::vector& ix, maelstrom::vector& values);
+
     template <typename E, typename I, typename V>
     void t_assign(E exec_policy, maelstrom::vector& dst, maelstrom::vector& ix, maelstrom::vector& values) {
         thrust::scatter(
@@ -80,6 +82,11 @@ namespace maelstrom {
         if(dst.get_dtype() != values.get_dtype()) throw std::runtime_error("values dtype does not match destination vector dtype");
         if(ix.size() != values.size()) throw std::runtime_error("index size must match values size");
         
+        auto mem_type = dst.get_mem_type();
+        if(maelstrom::is_dist(mem_type)) {
+            return assign_dispatch_dist(dst, ix, values);
+        }
+
         return assign_dispatch_exec_policy(dst, ix, values);
     }
 

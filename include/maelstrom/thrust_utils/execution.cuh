@@ -38,7 +38,8 @@ namespace maelstrom {
     };
 
     inline exec_policy get_execution_policy(maelstrom::vector& vec) {
-        switch(vec.get_mem_type()) {
+        auto mem_type = vec.get_mem_type();
+        switch(maelstrom::single_storage_of(mem_type)) {
             case HOST:
             case PINNED:
                 return exec_policy(false);

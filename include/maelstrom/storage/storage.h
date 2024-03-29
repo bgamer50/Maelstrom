@@ -14,7 +14,7 @@ namespace maelstrom
         DIST_MANAGED=6
     };
 
-    inline bool is_dist(storage& s) {
+    inline bool is_dist(storage s) {
         return (
             (s == storage::DIST_DEVICE) ||
             (s == storage::DIST_HOST) ||
@@ -22,7 +22,7 @@ namespace maelstrom
         );
     }
 
-    inline bool dist_type_of(storage& s) {
+    inline storage dist_storage_of(storage s) {
         switch(s) {
             case HOST:
             case DIST_HOST:
@@ -40,7 +40,7 @@ namespace maelstrom
         throw std::runtime_error(msg.str());
     }
 
-    inline bool single_type_of(storage& s) {
+    inline storage single_storage_of(storage s) {
         switch(s) {
             case HOST:
             case DIST_HOST:

@@ -30,7 +30,7 @@ namespace maelstrom {
 
     maelstrom::vector search_sorted(maelstrom::vector& sorted_array, maelstrom::vector& values_to_find) {
         if(sorted_array.get_dtype() != values_to_find.get_dtype()) throw std::runtime_error("Data types must match to search!");
-        if(sorted_array.get_mem_type() != values_to_find.get_mem_type()) throw std::runtime_error("Memory types must match to search!");
+        //if(sorted_array.get_mem_type() != values_to_find.get_mem_type()) throw std::runtime_error("Memory types must match to search!");
 
         return search_sorted_dispatch_exec_policy(sorted_array, values_to_find);
     }

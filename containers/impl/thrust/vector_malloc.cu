@@ -11,7 +11,10 @@ namespace maelstrom {
     void* maelstrom::vector::alloc(size_t N) {
         size_t dtype_size = maelstrom::size_of(this->dtype);
 
-        switch(this->mem_type) {
+        // Calls the base allocator
+        auto base_mem_type = maelstrom::single_storage_of(this->mem_type);
+
+        switch(base_mem_type) {
             case HOST: {
                 void* ptr;
                 cudaMallocManaged(&ptr, dtype_size * N);
@@ -51,7 +54,10 @@ namespace maelstrom {
     void maelstrom::vector::dealloc(void* ptr) {
         if(ptr == nullptr) throw std::invalid_argument("Cannot deallocate a null pointer");
 
-        switch(this->mem_type) {
+        // Calls the base allocator
+        auto base_mem_type = maelstrom::single_storage_of(this->mem_type);
+
+        switch(base_mem_type) {
             case HOST: {
                 cudaFree(ptr);
                 cudaDeviceSynchronize();
