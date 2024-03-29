@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_map>
+#include <string>
 #include <sstream>
 
 namespace maelstrom
@@ -13,6 +15,8 @@ namespace maelstrom
         DIST_HOST=5,
         DIST_MANAGED=6
     };
+
+    extern std::unordered_map<std::string, maelstrom::storage> storage_string_mapping;
 
     inline bool is_dist(storage s) {
         return (
