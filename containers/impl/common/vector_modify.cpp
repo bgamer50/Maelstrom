@@ -17,17 +17,7 @@ namespace maelstrom {
         throw std::runtime_error("push_back unimplemented");
     }
 
-    void vector::reserve(size_t N) {
-        if(N < this->filled_size) throw std::runtime_error("Cannot reserve fewer elements than size!");
-        
-        if(N <= this->reserved_size) return;
-
-        size_t old_filled_size = this->filled_size;
-        this->resize(N);
-        this->filled_size = old_filled_size;
-    }
-
-    void vector::insert(size_t ix_start, vector& new_elements, size_t add_ix_start, size_t add_ix_end) {
+    void vector::insert_local(size_t ix_start, vector& new_elements, size_t add_ix_start, size_t add_ix_end) {
         if(new_elements.filled_size == 0) {
             if(add_ix_end - add_ix_start > 0) throw std::runtime_error("Invalid range in new elements (empty vector)");
             else return;
@@ -41,7 +31,7 @@ namespace maelstrom {
         if(add_ix_end < add_ix_start) throw std::runtime_error("Invalid range in new elements");
         
         size_t insert_size = add_ix_end - add_ix_start;
-        size_t old_size = this->size();
+        size_t old_size = this->local_size();
         size_t new_size = old_size + insert_size;
         
         void* new_data = this->data_ptr;
@@ -85,26 +75,17 @@ namespace maelstrom {
         this->filled_size = new_size;
     }
 
-    void vector::resize(size_t N) {
-        if(this->view) throw std::runtime_error("Cannot resize a view!");
-
-        bool empty = (this->reserved_size == 0);
-        
-        // Don't resize if there is already enough space reserved
-        if(N <= reserved_size) {
-            this->filled_size = N;
-            return;
+    void vector::insert(size_t ix_start, vector& new_elements, size_t add_ix_start, size_t add_ix_end) {
+        if(maelstrom::is_dist(this->mem_type)) {
+            throw std::runtime_error("Cannot insert into distributed vector!");
         }
 
-        void* new_data = this->alloc(N);
-        if(!empty) {
-            this->copy(this->data_ptr, new_data, this->filled_size);
-            this->dealloc(this->data_ptr);
-        }
-        
-        this->data_ptr = new_data;
-        this->filled_size = N;
-        this->reserved_size = N;
+        return this->insert_local(
+            ix_start,
+            new_elements,
+            add_ix_start,
+            add_ix_end
+        );
     }
 
     void vector::shrink_to_fit() {
@@ -134,13 +115,13 @@ namespace maelstrom {
         );
 
         auto this_view = maelstrom::vector(
-            this->mem_type,
+            maelstrom::single_storage_of(this->mem_type),
             this->dtype,
             this->data_ptr,
             this->filled_size,
             true
         );
-        new_vec.insert(0, this_view);
+        new_vec.insert_local(0, this_view);
         return new_vec;
     }
 
