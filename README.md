@@ -1,3 +1,9 @@
+Version 1.0.3 (Expected June 2024)
+This version of Maelstrom adds support for distributed algorithms
+and containers.
+
+---------------------------------------------------------------
+
 Version 1.0.0
 
 Maelstrom is a collection of high-performance type erased structures and algorithms
