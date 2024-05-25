@@ -1,5 +1,8 @@
 #pragma once
 
+#include <unordered_map>
+#include <string>
+
 namespace maelstrom {
     enum comparator {
         GREATER_THAN = 0, // >
@@ -14,4 +17,6 @@ namespace maelstrom {
         INSIDE = 9, // (left, right)
         OUTSIDE = 10, // < left & > right
     };
+
+    extern std::unordered_map<comparator, std::string> comparator_names;
 }

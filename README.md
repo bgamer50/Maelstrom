@@ -1,4 +1,5 @@
 Version 1.0.3 (Expected June 2024)
+
 This version of Maelstrom adds support for distributed algorithms
 and containers.
 

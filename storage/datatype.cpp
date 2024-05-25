@@ -1,10 +1,25 @@
 #include "maelstrom/storage/datatype.h"
 #include "maelstrom/storage/storage.h"
+#include "maelstrom/storage/comparison.h"
 #include <limits>
 #include <cstdint>
 #include <stdexcept>
 
 namespace maelstrom {
+
+    std::unordered_map<maelstrom::comparator, std::string> comparator_names = {
+        {GREATER_THAN, ">"},
+        {LESS_THAN, "<"},
+        {EQUALS, "="},
+        {GREATER_THAN_OR_EQUAL, ">="},
+        {LESS_THAN_OR_EQUAL, "<="},
+        {NOT_EQUALS, "!="},
+        {BETWEEN, "[..)"},
+        {IS_IN, "∈"},
+        {IS_NOT_IN, "!∈"},
+        {INSIDE, "(..)"},
+        {OUTSIDE, "<>"}
+    };
 
     size_t size_of(primitive_t& prim_type) {
         switch(prim_type) {
