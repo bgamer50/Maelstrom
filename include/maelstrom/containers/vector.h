@@ -60,6 +60,18 @@ namespace maelstrom {
 
             inline bool is_view() { return this->view; }
 
+            /*
+                Pins the memory viewed by this vector.  If this vector is not a host view,
+                an exception is thrown.
+            */
+            void pin();
+
+            /*
+                Unpins the memory viewed by this vector.  If this vector is not a host view,
+                an exception is thrown.
+            */
+            void unpin();
+
             void push_back();
 
             void reserve(size_t N);

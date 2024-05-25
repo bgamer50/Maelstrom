@@ -104,4 +104,20 @@ namespace maelstrom {
         maelstrom::cuda::cudaCheckErrors("maelstrom vector copy");
     }
 
+    void maelstrom::vector::pin() {
+        if(!this->is_view() || this->mem_type != maelstrom::HOST) throw std::domain_error("Vector must be a host view to be pinned!");
+
+        cudaHostRegister(this->data_ptr, maelstrom::size_of(this->dtype) * this->local_size(), cudaHostRegisterReadOnly);
+        cudaDeviceSynchronize();
+        maelstrom::cuda::cudaCheckErrors("maelstrom vector pin");
+    }
+
+    void maelstrom::vector::unpin() {
+        if(!this->is_view() || this->mem_type != maelstrom::HOST) throw std::domain_error("Vector must be a host view to be unpinned!");
+
+        cudaHostUnregister(this->data_ptr);
+        cudaDeviceSynchronize();
+        maelstrom::cuda::cudaCheckErrors("maelstrom vector unpin");
+    }
+
 }
