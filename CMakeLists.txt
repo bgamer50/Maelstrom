@@ -65,6 +65,7 @@ add_library(
     algorithms/impl/thrust/math.cu
     algorithms/impl/thrust/cast.cu
     algorithms/impl/thrust/arange.cu
+    algorithms/impl/thrust/randperm.cu
     algorithms/impl/thrust/intersection.cu
     algorithms/impl/thrust/search_sorted.cu
     algorithms/impl/thrust/search_sorted_sparse.cu
@@ -183,6 +184,7 @@ AddMaelstromTest(test_reduce_by_key.exe tests/test_reduce_by_key.cpp)
 AddMaelstromTest(test_math.exe tests/test_math.cpp)
 AddMaelstromTest(test_cast.exe tests/test_cast.cpp)
 AddMaelstromTest(test_arange.exe tests/test_arange.cpp)
+AddMaelstromTest(test_randperm.exe tests/test_randperm.cpp)
 AddMaelstromTest(test_intersection.exe tests/test_intersection.cpp)
 AddMaelstromTest(test_search_sorted.exe tests/test_search_sorted.cpp)
 AddMaelstromTest(test_search_sorted_sparse.exe tests/test_search_sorted_sparse.cpp)

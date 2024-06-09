@@ -51,7 +51,7 @@ namespace maelstrom {
         }
     }
 
-    vector::vector(vector& orig, bool view)
+    vector::vector(const vector& orig, bool view)
     : vector(
         orig.mem_type,
         orig.dtype,
@@ -60,7 +60,7 @@ namespace maelstrom {
         view
     ) {}
 
-    vector::vector(vector& orig) {
+    vector::vector(const vector& orig) {
         if(&orig == this) {
             return;
         }

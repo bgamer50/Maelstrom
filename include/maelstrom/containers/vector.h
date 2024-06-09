@@ -44,9 +44,9 @@ namespace maelstrom {
             // over the provided data.  If view=false then this vector will own a copy of the provided data.
             vector(maelstrom::storage mem_type, maelstrom::dtype_t dtype, void* data, size_t N, bool view=true);
 
-            vector(vector& orig, bool view);
+            vector(const vector& orig, bool view);
 
-            vector(vector& orig);
+            vector(const vector& orig);
 
             ~vector();
 
