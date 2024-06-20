@@ -92,6 +92,73 @@ namespace maelstrom {
         }
     }
 
+    maelstrom::vector hash_table::get_keys() {
+        switch(this->mem_type) {
+            case HOST:
+                return *maelstrom::get_hash_table_items<HOST>(this->data_ptr, this->key_dtype, this->val_dtype, true, false).first;
+            case DEVICE:
+                return *maelstrom::get_hash_table_items<DEVICE>(this->data_ptr, this->key_dtype, this->val_dtype, true, false).first;
+            case MANAGED:
+                return *maelstrom::get_hash_table_items<MANAGED>(this->data_ptr, this->key_dtype, this->val_dtype, true, false).first;
+            default:
+                throw std::runtime_error("unsupported memory type for hash table get items");
+        }
+    }
+
+    maelstrom::vector hash_table::get_values() {
+        switch(this->mem_type) {
+            case HOST:
+                return *maelstrom::get_hash_table_items<HOST>(this->data_ptr, this->key_dtype, this->val_dtype, false, true).second;
+            case DEVICE:
+                return *maelstrom::get_hash_table_items<DEVICE>(this->data_ptr, this->key_dtype, this->val_dtype, false, true).second;
+            case MANAGED:
+                return *maelstrom::get_hash_table_items<MANAGED>(this->data_ptr, this->key_dtype, this->val_dtype, false, true).second;
+            default:
+                throw std::runtime_error("unsupported memory type for hash table get items");
+        }
+    }
+
+    std::pair<maelstrom::vector, maelstrom::vector> hash_table::get_items() {
+        switch(this->mem_type) {
+            case HOST: {
+                auto p = maelstrom::get_hash_table_items<HOST>(this->data_ptr, this->key_dtype, this->val_dtype, true, true);
+                return std::make_pair(
+                    std::move(*p.first),
+                    std::move(*p.second)
+                );
+            }
+            case DEVICE: {
+                auto p = maelstrom::get_hash_table_items<DEVICE>(this->data_ptr, this->key_dtype, this->val_dtype, true, true);
+                return std::make_pair(
+                    std::move(*p.first),
+                    std::move(*p.second)
+                );
+            }
+            case MANAGED: {
+                auto p = maelstrom::get_hash_table_items<MANAGED>(this->data_ptr, this->key_dtype, this->val_dtype, true, true);
+                return std::make_pair(
+                    std::move(*p.first),
+                    std::move(*p.second)
+                );
+            }
+            default:
+                throw std::runtime_error("unsupported memory type for hash table get items");
+        }
+    }
+
+    size_t hash_table::size() {
+        switch(this->mem_type) {
+            case HOST:
+                return maelstrom::size_hash_table<HOST>(this->data_ptr, this->key_dtype, this->val_dtype);
+            case DEVICE:
+                return maelstrom::size_hash_table<DEVICE>(this->data_ptr, this->key_dtype, this->val_dtype);
+            case MANAGED:
+                return maelstrom::size_hash_table<MANAGED>(this->data_ptr, this->key_dtype, this->val_dtype);
+            default:
+                throw std::invalid_argument("unsupported memory type for hash table size");
+        }
+    }
+
     void hash_table::remove(maelstrom::vector& keys) {
         if(this->mem_type == HOST && (keys.get_mem_type() == DEVICE)) {
             throw std::runtime_error("can't use device array to access host hash table");

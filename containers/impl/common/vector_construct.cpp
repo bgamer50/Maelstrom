@@ -126,7 +126,7 @@ namespace maelstrom {
         return *this;
     }
 
-    vector& vector::operator=(vector& other) noexcept {
+    vector& vector::operator=(const vector& other) noexcept {
         if(&other == this) {
             return *this;
         }

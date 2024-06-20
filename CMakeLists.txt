@@ -45,12 +45,16 @@ add_library(
     containers/impl/cuco/hash_destroy_cuco.cu
     containers/impl/cuco/hash_insert_cuco.cu
     containers/impl/cuco/hash_get_cuco.cu
+    containers/impl/cuco/hash_get_items_cuco.cu
     containers/impl/cuco/hash_remove_cuco.cu
+    containers/impl/cuco/hash_size_cuco.cu
     containers/impl/host/hash_construct_host.cu
     containers/impl/host/hash_destroy_host.cu
     containers/impl/host/hash_insert_host.cu
     containers/impl/host/hash_get_host.cu
+    containers/impl/host/hash_get_items_host.cu
     containers/impl/host/hash_remove_host.cu
+    containers/impl/host/hash_size_host.cu
     algorithms/impl/thrust/remove_if.cu
     algorithms/impl/thrust/increment.cu
     algorithms/impl/thrust/select.cu

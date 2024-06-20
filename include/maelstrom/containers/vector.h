@@ -54,7 +54,7 @@ namespace maelstrom {
             
             vector& operator=(vector&& other) noexcept;
 
-            vector& operator=(vector& other) noexcept;
+            vector& operator=(const vector& other) noexcept;
 
             inline bool is_dist() { return maelstrom::is_dist(this->mem_type); }
 
