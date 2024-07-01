@@ -6,6 +6,7 @@
 #include "maelstrom/algorithms/arange.h"
 #include "maelstrom/algorithms/filter.h"
 #include "maelstrom/algorithms/sort.h"
+#include "maelstrom/algorithms/count_unique.h"
 
 #include "maelstrom/algorithms/sparse/query_adjacency.h"
 #include "maelstrom/algorithms/sparse/search_sorted_sparse.h"
@@ -150,6 +151,28 @@ namespace maelstrom {
         }
 
         throw std::runtime_error("adj-querying a COO matrix is unsupported");
+    }
+
+    std::pair<maelstrom::vector, maelstrom::vector> basic_sparse_matrix::nnz_i(maelstrom::vector& ix, maelstrom::vector& rel_types) {
+        if(this->format == COO) throw std::domain_error("This operation is illegal in COO format");
+
+        maelstrom::vector cx;
+        std::tie(cx, std::ignore, std::ignore, std::ignore) = maelstrom::sparse::query_adjacency(
+            this->format == CSR ? this->row : this->col,
+            this->format == CSR ? this->col : this->row,
+            this->val,
+            this->rel,
+            ix,
+            rel_types,
+            false,
+            false,
+            false,
+            false
+        );
+
+        return std::move(
+            maelstrom::count_unique(cx)
+        );
     }
 
     void basic_sparse_matrix::set(maelstrom::vector new_rows, size_t new_num_rows, maelstrom::vector new_cols, size_t new_num_cols, maelstrom::vector new_vals, maelstrom::vector new_rels) {
