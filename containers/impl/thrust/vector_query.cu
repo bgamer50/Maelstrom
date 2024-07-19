@@ -16,11 +16,13 @@ namespace maelstrom {
         // simply return the filled size for a non-distributed vector
         if(!maelstrom::is_dist(this->mem_type)) return this->filled_size;
 
+        auto current_stream = std::any_cast<cudaStream_t>(this->get_stream());
+
         // For a distributed vector, take the sum of all filled sizes
         size_t* size_device;
         cudaMalloc(&size_device, sizeof(size_t) * 1);
         cudaMemcpy(size_device, &this->filled_size, sizeof(size_t) * 1, cudaMemcpyDefault);
-        cudaDeviceSynchronize();
+        cudaStreamSynchronize(current_stream);
         maelstrom::cuda::cudaCheckErrors("initialize size");
 
         maelstrom::nccl::ncclCheckErrors(
@@ -31,18 +33,16 @@ namespace maelstrom {
             ncclUint64,
             ncclSum,
             maelstrom::get_nccl_comms(),
-            maelstrom::get_cuda_stream()
+            current_stream
             ),
             "sum size all reduce"
         );
 
-        cudaStreamSynchronize(
-            maelstrom::get_cuda_stream()
-        );
+        cudaStreamSynchronize(current_stream);
 
         size_t total_size;
         cudaMemcpy(&total_size, size_device, sizeof(size_t) * 1, cudaMemcpyDefault);
-        cudaDeviceSynchronize();
+        cudaStreamSynchronize(current_stream);
         cudaFree(size_device);
         return total_size;
     }

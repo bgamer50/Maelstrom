@@ -13,6 +13,7 @@ namespace maelstrom {
         this->reserved_size = 0;
         this->data_ptr = nullptr;
         this->view = false;
+        this->stream = get_default_stream(mem_type);
     }
 
     // Default constructor; creates a blank device vector of default dtype
@@ -27,8 +28,10 @@ namespace maelstrom {
         this->reserved_size = 0;
         this->data_ptr = nullptr;
         this->view = false;
+        this->stream = get_default_stream(mem_type);
 
         this->resize(N);
+        
     }
 
     // Creates a vector corresponding to the provided data.  If view=true then this vector is only a view
@@ -39,6 +42,7 @@ namespace maelstrom {
         this->view = view;
         this->reserved_size = 0;
         this->filled_size = 0;
+        this->stream = get_default_stream(mem_type);
 
         if(this->view) { 
             this->data_ptr = data; 
@@ -58,7 +62,7 @@ namespace maelstrom {
         orig.data_ptr,
         orig.filled_size,
         view
-    ) {}
+    ) { this->stream = orig.stream; }
 
     vector::vector(const vector& orig) {
         if(&orig == this) {
@@ -71,6 +75,7 @@ namespace maelstrom {
         this->reserved_size = 0;
         this->view = false;
         this->data_ptr = nullptr;
+        this->stream = orig.stream;
 
         if(this->filled_size > 0) {
             this->resize(orig.filled_size);
@@ -89,6 +94,7 @@ namespace maelstrom {
         this->dtype = other.dtype;
         this->mem_type = other.mem_type;
         this->view = other.view;
+        this->stream = other.stream;
 
         other.data_ptr = nullptr;
         other.filled_size = 0;
@@ -117,6 +123,7 @@ namespace maelstrom {
         this->dtype = other.dtype;
         this->mem_type = other.mem_type;
         this->view = other.view;
+        this->stream = other.stream;
 
         other.data_ptr = nullptr;
         other.filled_size = 0;
@@ -138,6 +145,7 @@ namespace maelstrom {
         this->mem_type = other.mem_type;
         this->dtype = other.dtype;
         this->view = other.view;
+        this->stream = other.stream;
 
         this->data_ptr = this->alloc(other.reserved_size);
         this->filled_size = other.filled_size;

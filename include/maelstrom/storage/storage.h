@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <any>
 #include <sstream>
 
 namespace maelstrom
@@ -63,4 +64,19 @@ namespace maelstrom
         msg << "Invalid storage type " << s;
         throw std::runtime_error(msg.str());
     }
+
+    /*
+        Creates a new stream associated with the given storage.
+        i.e. calls cudaStreamCreate for DEVICE storage.
+        If the storage doesn't support streams, an empty
+        any is returned instead.
+    */
+    std::any create_stream(storage s);
+
+    /*
+        Destroys the stream associated with the given storage.
+    */
+    void destroy_stream(storage s, std::any stream);
+
+    std::any get_default_stream(storage s);
 }

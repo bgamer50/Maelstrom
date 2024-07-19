@@ -44,6 +44,8 @@ namespace maelstrom {
     }
 
     inline maelstrom::vector get_current_partition_sizes(maelstrom::vector& vec) {
+        auto current_stream = std::any_cast<cudaStream_t>(vec.get_stream());
+        
         maelstrom::vector local_sizes(
             maelstrom::single_storage_of(vec.get_mem_type()),
             maelstrom::uint64,
@@ -58,11 +60,11 @@ namespace maelstrom {
                 1,
                 ncclUint64,
                 maelstrom::get_nccl_comms(),
-                maelstrom::get_cuda_stream()
+                current_stream
             ),
             "get local sizes allgather"
         );
-        cudaStreamSynchronize(maelstrom::get_cuda_stream());
+        cudaStreamSynchronize(current_stream);
 
         return local_sizes;
     }

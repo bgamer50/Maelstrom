@@ -12,5 +12,4 @@ namespace maelstrom {
 
     ncclComm_t& get_nccl_comms();
 
-    inline cudaStream_t get_cuda_stream() { return 0; }
 }

@@ -21,7 +21,7 @@ namespace maelstrom {
         size_t rank = maelstrom::get_rank();
         size_t world_size = maelstrom::get_world_size();
         auto comm = maelstrom::get_nccl_comms();
-        auto stream = maelstrom::get_cuda_stream();
+        auto stream = std::any_cast<cudaStream_t>(vec.get_stream());
         auto dtype = vec.get_dtype();
 
         auto partitions = maelstrom::get_partitions(vec.size());
@@ -43,7 +43,7 @@ namespace maelstrom {
             ncclAllGather(local_size_device, static_cast<size_t*>(local_offsets.data()) + 1, 1, ncclUint64, comm, stream),
             "rebalance allgather get local sizes"
         );
-        cudaDeviceSynchronize();
+        cudaStreamSynchronize(stream);
         cudaFree(local_size_device);
 
         static_cast<size_t*>(local_offsets.data())[0] = 0;

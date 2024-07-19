@@ -25,7 +25,7 @@ namespace maelstrom {
         size_t rank = maelstrom::get_rank();
         size_t world_size = maelstrom::get_world_size();
         auto comm = maelstrom::get_nccl_comms();
-        auto stream = maelstrom::get_cuda_stream();
+        auto stream = std::any_cast<cudaStream_t>(vec.get_stream());
         auto dtype = vec.get_dtype();
 
         maelstrom::vector destinations, counts;
@@ -47,7 +47,7 @@ namespace maelstrom {
             ncclAllGather(send_sizes.data(), send_sizes.data(), world_size, ncclUint64, comm, stream),
             "shuffle allgather get send sizes"
         );
-        cudaDeviceSynchronize();
+        cudaStreamSynchronize(stream);
 
         size_t new_partition_size = 0;
         for(size_t k = 0; k < world_size; ++k) new_partition_size += static_cast<size_t*>(send_sizes.data())[k * world_size + rank];
@@ -68,7 +68,7 @@ namespace maelstrom {
                     ncclSend(data_start, send_size, ncclUint8, dst, comm, stream),
                     "shuffle send data"
                 );
-                cudaDeviceSynchronize();
+                cudaStreamSynchronize(stream);
             }
 
             vec.clear();
@@ -82,7 +82,7 @@ namespace maelstrom {
                     ncclRecv(static_cast<uint8_t*>(vec.data()) + received, recv_bytes, ncclUint8, src, comm, stream),
                     "shuffle recv data"
                 );
-                cudaDeviceSynchronize();
+                cudaStreamSynchronize(stream);
 
                 received += recv_bytes;
             }

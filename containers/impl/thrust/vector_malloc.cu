@@ -25,7 +25,7 @@ namespace maelstrom {
             }
             case DEVICE: {
                 void* ptr;
-                cudaMalloc(&ptr, dtype_size * N);
+                cudaMallocAsync(&ptr, dtype_size * N, std::any_cast<cudaStream_t>(this->stream));
                 cudaDeviceSynchronize();
                 maelstrom::cuda::cudaCheckErrors("vector alloc device memory");
                 return ptr;
@@ -56,6 +56,7 @@ namespace maelstrom {
 
         // Calls the base allocator
         auto base_mem_type = maelstrom::single_storage_of(this->mem_type);
+        auto current_stream = std::any_cast<cudaStream_t>(this->stream);
 
         switch(base_mem_type) {
             case HOST: {
@@ -75,8 +76,8 @@ namespace maelstrom {
                 return;
             }
             case DEVICE: {
-                cudaFree(ptr);
-                cudaDeviceSynchronize();
+                cudaFreeAsync(ptr, current_stream);
+                cudaStreamSynchronize(current_stream);
                 std::stringstream sx;
                 sx << "vector dealloc device memory (" << this->name << ")";
                 maelstrom::cuda::cudaCheckErrors(sx.str());
@@ -98,9 +99,10 @@ namespace maelstrom {
     // Copies from src (first arg) to dst (second arg) using cudaMemcpy.
     void maelstrom::vector::copy(void* src, void* dst, size_t size) {
         if(src == dst) return;
+        auto current_stream = std::any_cast<cudaStream_t>(this->stream);
 
-        cudaMemcpy(dst, src, maelstrom::size_of(this->dtype) * size, cudaMemcpyDefault);
-        cudaDeviceSynchronize();
+        cudaMemcpyAsync(dst, src, maelstrom::size_of(this->dtype) * size, cudaMemcpyDefault, current_stream);
+        cudaStreamSynchronize(current_stream);
         maelstrom::cuda::cudaCheckErrors("maelstrom vector copy");
     }
 

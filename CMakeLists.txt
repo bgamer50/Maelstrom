@@ -36,6 +36,7 @@ add_library(
     algorithms/impl/host/csr_to_coo_host.cpp
 
     # thrust/cuda
+    storage/stream.cu
     containers/impl/thrust/vector_malloc.cu
     containers/impl/thrust/vector_access.cu
     containers/impl/thrust/vector_query.cu

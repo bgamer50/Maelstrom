@@ -19,6 +19,7 @@ namespace maelstrom {
             
             maelstrom::storage mem_type;
             maelstrom::dtype_t dtype;
+            std::any stream;
             
             bool view;
 
@@ -164,6 +165,26 @@ namespace maelstrom {
             void resize_local(size_t N);
 
             void shrink_to_fit();
+
+            /*
+                Sets the stream of this vector.  Affects the maelstrom execution policy.
+                The meaning of a stream differs depending on the storage (device, host, distributed, etc.)
+                of this vector.
+            */
+            inline void set_stream(std::any stream) {
+                this->stream = stream;
+            }
+
+            inline std::any get_stream() {
+                return this->stream;
+            }
+
+            /*
+                Restores the default stream.
+            */
+            inline void clear_stream() {
+                this->stream = get_default_stream(this->mem_type);
+            }
 
             /*
                 Elementwise sum of two vectors
