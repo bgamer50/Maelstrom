@@ -30,13 +30,13 @@ namespace maelstrom {
             local_sizes,
             ix
         );
+        auto rix_local_view = maelstrom::local_view_of(rix);
 
         auto values_copy = maelstrom::vector(values, false);
         auto ix_copy = maelstrom::vector(ix, false);
-        std::cout << "made copies" << std::endl;
 
-        maelstrom::shuffle(values_copy, rix);
-        maelstrom::shuffle(ix_copy, rix);
+        maelstrom::shuffle(ix_copy, rix_local_view);
+        maelstrom::shuffle(values_copy, rix_local_view);
 
         size_t rank = maelstrom::get_rank();
         size_t local_offset = (rank == 0) ? 0 : std::any_cast<size_t>(local_sizes.get(rank - 1));
@@ -47,7 +47,7 @@ namespace maelstrom {
             maelstrom::DECREMENT
         );
 
-        maelstrom::vector dst_local_view(mem_type, dst.get_dtype(), dst.data(), dst.local_size(), true);
+        auto dst_local_view = maelstrom::local_view_of(dst);
         maelstrom::assign(
             dst_local_view,
             ix_copy,

@@ -11,7 +11,7 @@ namespace maelstrom {
         thrust::scatter(
             exec_policy,
             maelstrom::device_tptr_cast<V>(values.data()),
-            maelstrom::device_tptr_cast<V>(values.data()) + values.size(),
+            maelstrom::device_tptr_cast<V>(values.data()) + values.local_size(),
             maelstrom::device_tptr_cast<I>(ix.data()),
             maelstrom::device_tptr_cast<V>(dst.data())
         );
@@ -80,7 +80,7 @@ namespace maelstrom {
 
     void assign(maelstrom::vector& dst, maelstrom::vector& ix, maelstrom::vector& values) {
         if(dst.get_dtype() != values.get_dtype()) throw std::runtime_error("values dtype does not match destination vector dtype");
-        if(ix.size() != values.size()) throw std::runtime_error("index size must match values size");
+        if(ix.local_size() != values.local_size()) throw std::runtime_error("index size must match values size");
         
         auto mem_type = dst.get_mem_type();
         if(maelstrom::is_dist(mem_type)) {

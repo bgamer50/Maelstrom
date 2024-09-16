@@ -32,6 +32,7 @@ namespace maelstrom {
         std::tie(destinations, counts) = maelstrom::count_unique(rix, true);
         
         maelstrom::vector send_sizes(maelstrom::MANAGED, maelstrom::uint64, world_size * world_size);
+        maelstrom::set(send_sizes, static_cast<size_t>(0));
         maelstrom::assign(
             send_sizes,
             destinations,
@@ -56,6 +57,10 @@ namespace maelstrom {
         size_t* offset_a = static_cast<size_t*>(send_offsets.data());
         size_t bytes_per_element = maelstrom::size_of(dtype);
 
+        maelstrom::vector vec_copy(vec);
+        vec.clear();
+        vec.resize_local(new_partition_size);
+
         maelstrom::nccl::ncclCheckErrors(ncclGroupStart(), "shuffle start nccl group");
         {
             for(size_t dst = 0; dst < world_size; ++dst) {
@@ -63,16 +68,13 @@ namespace maelstrom {
                 size_t end_offset = offset_a[dst];
                 size_t send_size = (end_offset - start_offset) * bytes_per_element;
                 
-                uint8_t* data_start = static_cast<uint8_t*>(vec.data()) + (start_offset * bytes_per_element);
+                uint8_t* data_start = static_cast<uint8_t*>(vec_copy.data()) + (start_offset * bytes_per_element);
                 maelstrom::nccl::ncclCheckErrors(
                     ncclSend(data_start, send_size, ncclUint8, dst, comm, stream),
                     "shuffle send data"
                 );
                 cudaStreamSynchronize(stream);
             }
-
-            vec.clear();
-            vec.resize_local(new_partition_size);
 
             size_t received = 0;
             for(size_t src = 0; src < world_size; ++src) {

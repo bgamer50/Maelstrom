@@ -6,6 +6,9 @@
 #include <sstream>
 
 namespace maelstrom {
+
+    extern maelstrom::vector select_dispatch_dist(maelstrom::vector& vec, maelstrom::vector& idx);
+
     template<typename E, typename T, typename I>
     maelstrom::vector t_select(E thrust_exec_policy, maelstrom::vector& vec, maelstrom::vector& idx) {
         auto out = maelstrom::make_vector_like(vec);
@@ -71,16 +74,9 @@ namespace maelstrom {
     }
 
     maelstrom::vector select(maelstrom::vector& vec, maelstrom::vector& idx) {
-        // Error checking
-        // TODO do this properly
-        /*
-        if(vec.get_mem_type() != idx.get_mem_type()) {
-            std::stringstream sx;
-            sx << "Memory type of array (" << vec.get_mem_type() << ")";
-            sx << " does not match memory type of index (" << idx.get_mem_type() << ")";
-            throw std::runtime_error(sx.str());
+        if(maelstrom::is_dist(vec.get_mem_type())) {
+            return select_dispatch_dist(vec, idx);
         }
-        */
 
         std::any exec_policy = maelstrom::get_execution_policy(vec).get();
         const std::type_info& t = exec_policy.type();

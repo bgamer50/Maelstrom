@@ -9,6 +9,10 @@ namespace maelstrom {
     extern maelstrom::vector search_sorted_device_dispatch_val(E exec_policy, maelstrom::vector& sorted_array, maelstrom::vector& values_to_find);
 
     maelstrom::vector search_sorted_dispatch_exec_policy(maelstrom::vector& sorted_array, maelstrom::vector& values_to_find) {
+        if(maelstrom::is_dist(sorted_array.get_mem_type())) {
+            throw std::invalid_argument("The vector being searched cannot be distributed for search_sorted.");
+        }
+
         std::any exec_policy = maelstrom::get_execution_policy(sorted_array).get();
         const std::type_info& t = exec_policy.type();
         

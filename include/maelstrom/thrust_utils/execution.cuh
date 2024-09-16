@@ -47,9 +47,9 @@ namespace maelstrom {
         auto mem_type = vec.get_mem_type();
         switch(maelstrom::single_storage_of(mem_type)) {
             case HOST:
-            case PINNED:
                 return exec_policy(false);
             case DEVICE:
+            case PINNED:
             case MANAGED: {
                 std::optional<cudaStream_t> st = std::nullopt;
                 auto stream = vec.get_stream();

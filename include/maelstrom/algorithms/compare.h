@@ -15,6 +15,10 @@ namespace maelstrom {
     maelstrom::vector compare(maelstrom::vector& vec1, maelstrom::vector& vec2, maelstrom::comparator cmp, bool invert=false);
 
     inline maelstrom::vector compare_select(maelstrom::vector& vec1, maelstrom::vector& vec2, maelstrom::comparator cmp) {
+        if(maelstrom::is_dist(vec1.get_mem_type()) || maelstrom::is_dist(vec2.get_mem_type())) {
+            throw std::invalid_argument("Distributed vectors are not supported for compare_select");
+        }
+
         maelstrom::vector mask = maelstrom::compare(vec1, vec2, cmp, true);
 
         maelstrom::vector vec1_copy(vec1);

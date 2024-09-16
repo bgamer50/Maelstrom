@@ -1,5 +1,8 @@
 #include "maelstrom/algorithms/sort.h"
 #include "maelstrom/algorithms/arange.h"
+
+#include "maelstrom/algorithms/dist/bucket_sort.h"
+
 #include "maelstrom/thrust_utils/thrust_utils.cuh"
 
 namespace maelstrom {
@@ -144,6 +147,9 @@ namespace maelstrom {
             bool dtype_mismatch = false;
             bool uint64_uint32_prim_only = true;
             for(auto& vec : vectors) {
+                if(maelstrom::is_dist(vec.get().get_mem_type())) {
+                    throw std::invalid_argument("Sorting multiple vectors is not supported for distributed vectors");
+                }
                 auto current_dtype = vec.get().get_dtype();
                 if(current_dtype != dtype) dtype_mismatch = true;
                 if(current_dtype.prim_type != UINT64 && current_dtype.prim_type != UINT32 ) uint64_uint32_prim_only = false;
@@ -158,6 +164,8 @@ namespace maelstrom {
                 }
                 throw std::runtime_error("Types of vectors to be sorted must match!");
             }
+        } else if(maelstrom::is_dist(vectors.front().get().get_mem_type())) {
+            return maelstrom::bucket_sort(vectors.front().get());
         }
         return sort_dispatch_exec_policy(std::move(vectors));
     }

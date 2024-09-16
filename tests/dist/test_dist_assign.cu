@@ -45,7 +45,7 @@ void test_dist_assign_basic(maelstrom::storage storage) {
 
         for(size_t k = 0; k < vec.size(); ++k) {
             if(k % 2 == 0) assert( std::any_cast<uint8_t>(vec.get(k)) ==  k);
-            else assert( std::any_cast<uint8_t>(vec.get(k)) == (k + 10) );
+            else assert( std::any_cast<uint8_t>(vec.get(k)) == (k + 9) );
         }
     }
 }

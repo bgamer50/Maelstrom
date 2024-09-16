@@ -65,6 +65,10 @@ namespace maelstrom {
     }
 
     void vector::resize_local(size_t N) {
+        if(N == 0) {
+            return this->clear();
+        }
+
         if(this->view) throw std::runtime_error("Cannot resize a view!");
 
         bool empty = (this->reserved_size == 0);

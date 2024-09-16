@@ -14,7 +14,7 @@ namespace maelstrom {
         max_num_values is the maximum number of unique values and is required.
         If sorted=true, will skip the required copy-and-sort step.
     */
-    std::pair<maelstrom::vector, maelstrom::vector> count_unique(maelstrom::vector& vec, size_t max_num_values, bool sorted=false);
+    std::pair<maelstrom::vector, maelstrom::vector> count_unique(maelstrom::vector& vec, size_t max_num_local_values, bool sorted=false);
 
     /*
         Returns a pair.

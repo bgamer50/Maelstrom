@@ -55,6 +55,9 @@ namespace maelstrom {
     }
 
     void prefix_sum(maelstrom::vector& vec) {
+        if(vec.is_dist()) {
+            throw std::invalid_argument("Prefix sum is not supported for distributed vectors");
+        }
         return prefix_sum_dispatch_exec_policy(vec);
     }
 }

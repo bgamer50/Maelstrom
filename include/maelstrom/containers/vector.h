@@ -38,12 +38,16 @@ namespace maelstrom {
             // Default constructor; creates a blank device vector of FLOAT64 dtype
             vector();
 
-            // Creates a vector of size N unitialized values of the given data type and given memory type.
-            vector(maelstrom::storage mem_type, maelstrom::dtype_t dtype, size_t N);
+            // Creates a vector of global_size unitialized values of the given data type and given memory type.
+            vector(maelstrom::storage mem_type, maelstrom::dtype_t dtype, size_t global_size);
+
+            // Safely creates a vector of global_size unitialized values of the given data type and memory type,
+            // with the specificed local partition size.
+            vector(maelstrom::storage mem_type, maelstrom::dtype_t dtype, size_t global_size, size_t local_partition_size);
 
             // Creates a vector corresponding to the provided data.  If view=true then this vector is only a view
             // over the provided data.  If view=false then this vector will own a copy of the provided data.
-            vector(maelstrom::storage mem_type, maelstrom::dtype_t dtype, void* data, size_t N, bool view=true);
+            vector(maelstrom::storage mem_type, maelstrom::dtype_t dtype, void* data, size_t local_partition_size, bool view=true);
 
             vector(const vector& orig, bool view);
 
@@ -236,16 +240,35 @@ namespace maelstrom {
     */
     maelstrom::vector as_primitive_vector(maelstrom::vector& vec, bool view=true);
 
-    /*
-        Makes a new emtpy vector with the same memory type and data type as the given vector.
+   /*
+       Makes a new emtpy vector with the same memory type and data type as the given vector.
         
-    */
+   */
    inline maelstrom::vector make_vector_like(maelstrom::vector& vec) {
         return maelstrom::vector(
             vec.get_mem_type(),
             vec.get_dtype()
         );
    }
+
+   /*
+        Returns a view of the local partition of the given distributed vector.
+   */
+   inline maelstrom::vector local_view_of(maelstrom::vector& vec) {
+        return maelstrom::vector(
+            maelstrom::single_storage_of(vec.get_mem_type()),
+            vec.get_dtype(),
+            vec.data(),
+            vec.local_size(),
+            true
+        );
+    }
+
+    /*
+        Converts the vector to a distributed vector of the given memory type
+        and returns it.
+    */
+    maelstrom::vector to_dist_vector(maelstrom::vector vec);
 
    /*
         Makes a new vector of appropriate data type from the given vector of anys

@@ -11,6 +11,7 @@
 #include "maelstrom/dist_utils/nccl_utils.cuh"
 
 #include "nccl.h"
+#include <iostream>
 
 namespace maelstrom {
     inline std::vector<size_t> get_partitions(size_t array_length) {
@@ -21,7 +22,7 @@ namespace maelstrom {
         std::vector<size_t> dv;
         dv.push_back(0);
         for(size_t k = 0; k < r; ++k) dv.push_back(q+1);
-        for(size_t k = 0; k < (q-r); ++k) dv.push_back(q);
+        for(size_t k = 0; k < (world_size-r); ++k) dv.push_back(q);
 
         std::partial_sum(dv.begin(), dv.end(), dv.begin());
         return dv;

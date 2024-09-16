@@ -6,12 +6,12 @@ namespace maelstrom {
 
     template <typename E, typename I, typename O>
     maelstrom::vector t_cast(E exec_policy, maelstrom::vector& vec, maelstrom::dtype_t new_type) {
-        maelstrom::vector new_vec(vec.get_mem_type(), new_type, vec.size());
+        maelstrom::vector new_vec(vec.get_mem_type(), new_type, vec.size(), vec.local_size());
 
         thrust::transform(
             exec_policy,
             maelstrom::device_tptr_cast<I>(vec.data()),
-            maelstrom::device_tptr_cast<I>(vec.data()) + vec.size(),
+            maelstrom::device_tptr_cast<I>(vec.data()) + vec.local_size(),
             maelstrom::device_tptr_cast<O>(new_vec.data()),
             maelstrom::cast_fn<I, O>()
         );
@@ -27,7 +27,7 @@ namespace maelstrom {
             case UINT32:
                 return t_cast<E, I, uint32_t>(exec_policy, vec, new_type);
             case UINT8:
-                return t_cast<E, I, uint64_t>(exec_policy, vec, new_type);
+                return t_cast<E, I, uint8_t>(exec_policy, vec, new_type);
             case INT64:
                 return t_cast<E, I, int64_t>(exec_policy, vec, new_type);
             case INT32:

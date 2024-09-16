@@ -40,6 +40,7 @@ add_library(
     containers/impl/thrust/vector_malloc.cu
     containers/impl/thrust/vector_access.cu
     containers/impl/thrust/vector_query.cu
+    containers/impl/thrust/vector_utils.cu
     containers/impl/thrust/basic_sparse_matrix_convert.cu
     containers/impl/thrust/basic_sparse_matrix_query.cu
     containers/impl/cuco/hash_construct_cuco.cu
@@ -59,6 +60,7 @@ add_library(
     algorithms/impl/thrust/remove_if.cu
     algorithms/impl/thrust/increment.cu
     algorithms/impl/thrust/select.cu
+    algorithms/impl/thrust/select_dist.cu
     algorithms/impl/thrust/set.cu
     algorithms/impl/thrust/filter.cu
     algorithms/impl/thrust/compare.cu
@@ -81,8 +83,10 @@ add_library(
     algorithms/impl/thrust/assign.cu
     algorithms/impl/thrust/assign_dist.cu
     algorithms/impl/thrust/sort_uint_index.cu
+    algorithms/impl/thrust/bucket_sort.cu
     algorithms/impl/thrust/rebalance.cu
     algorithms/impl/thrust/shuffle.cu
+    algorithms/impl/thrust/similarity.cu
     algorithms/impl/cuda/search_sorted_device.cu
     algorithms/impl/cuda/query_adjacency_device.cu
     algorithms/impl/cuda/search_sorted_sparse_device.cu
@@ -201,6 +205,7 @@ AddMaelstromTest(test_csr_to_coo.exe tests/test_csr_to_coo.cpp)
 AddMaelstromTest(test_prefix_sum.exe tests/test_prefix_sum.cpp)
 AddMaelstromTest(test_hash_table.exe tests/test_hash_table.cpp)
 AddMaelstromTest(test_assign.exe tests/test_assign.cpp)
+AddMaelstromTest(test_similarity.exe tests/test_similarity.cpp)
 
 AddMaelstromDistTest(test_dist_init.exe tests/dist/test_dist_init.cu)
 AddMaelstromDistTest(test_dist_arange.exe tests/dist/test_dist_arange.cu)
@@ -209,3 +214,8 @@ AddMaelstromDistTest(test_dist_rebalance.exe tests/dist/test_dist_rebalance.cu)
 AddMaelstromDistTest(test_dist_set.exe tests/dist/test_dist_set.cu)
 AddMaelstromDistTest(test_dist_assign.exe tests/dist/test_dist_assign.cu)
 AddMaelstromDistTest(test_dist_increment.exe tests/dist/test_dist_increment.cu)
+AddMaelstromDistTest(test_dist_cast.exe tests/dist/test_dist_cast.cu)
+AddMaelstromDistTest(test_dist_compare.exe tests/dist/test_dist_compare.cu)
+AddMaelstromDistTest(test_dist_count_unique.exe tests/dist/test_dist_count_unique.cu)
+AddMaelstromDistTest(test_dist_sort.exe tests/dist/test_dist_sort.cu)
+AddMaelstromDistTest(test_dist_select.exe tests/dist/test_dist_select.cu)
