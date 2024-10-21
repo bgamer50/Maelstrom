@@ -1,3 +1,5 @@
+#pragma once
+
 #include "maelstrom/containers/vector.h"
 #include <vector>
 

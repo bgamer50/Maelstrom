@@ -5,7 +5,9 @@
 namespace maelstrom {
     enum inc_op {
         INCREMENT=0,
-        DECREMENT=1
+        DECREMENT=1,
+        MODULUS=2,
+        DIVIDE=3
     };
 
     /*

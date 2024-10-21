@@ -57,6 +57,43 @@ namespace maelstrom {
         }
     };
 
+    template <typename T>
+    struct unary_div_op : public thrust::unary_function<T, T> {
+        T div_val;
+        
+        __device__ __host__ T operator()(T in) const {
+            return in / div_val;
+        }
+    };
+
+    template <typename T>
+    struct unary_modulus_op : public thrust::unary_function<T, T> {
+        T mod_val;  
+        
+        __device__ __host__ T operator ()(T& in) {
+            return in % mod_val;
+        }
+    };
+
+    template<>
+    struct unary_modulus_op<double> {
+        double mod_val;
+
+        __device__ __host__ double operator ()(double& in) {
+            return static_cast<int>(in) % static_cast<int>(mod_val);
+        }
+    };
+
+    
+    template<>
+    struct unary_modulus_op<float> {
+        float mod_val;
+
+        __device__ __host__ float operator ()(float& in) {
+            return static_cast<int>(in) % static_cast<int>(mod_val);
+        }
+    };
+
     template<typename T>
     struct is_max_val {
         __host__ __device__ bool operator() (const T val) {

@@ -16,27 +16,49 @@ namespace maelstrom {
             inc_val = std::any_cast<T>(maelstrom::safe_any_cast(inc, vec.get_dtype()));
         }
 
-        maelstrom::unary_plus_op<T> adder;
-        adder.plus_val = inc_val;
-        
-        switch(op) {
-            case INCREMENT:
-                adder.subtract = false;
-                break;
-            case DECREMENT:
-                adder.subtract = true;
-                break;
-            default:
-                throw std::runtime_error("Invalid increment operation");
-        }
+        if(op == MODULUS) {
+            maelstrom::unary_modulus_op<T> modder;
+            modder.mod_val = inc_val;
+            thrust::transform(
+                exec_policy,
+                device_tptr_cast<T>(vec.data()) + start,
+                device_tptr_cast<T>(vec.data()) + end,
+                device_tptr_cast<T>(vec.data()) + start,
+                modder
+            );
+        } else if(op == DIVIDE) {
+            maelstrom::unary_div_op<T> divider;
+            divider.div_val = inc_val;
+            thrust::transform(
+                exec_policy,
+                device_tptr_cast<T>(vec.data()) + start,
+                device_tptr_cast<T>(vec.data()) + end,
+                device_tptr_cast<T>(vec.data()) + start,
+                divider
+            );
+        } else {
+            maelstrom::unary_plus_op<T> adder;
+            adder.plus_val = inc_val;
+            
+            switch(op) {
+                case INCREMENT:
+                    adder.subtract = false;
+                    break;
+                case DECREMENT:
+                    adder.subtract = true;
+                    break;
+                default:
+                    throw std::runtime_error("Invalid increment operation");
+            }
 
-        thrust::transform(
-            exec_policy,
-            device_tptr_cast<T>(vec.data()) + start,
-            device_tptr_cast<T>(vec.data()) + end,
-            device_tptr_cast<T>(vec.data()) + start,
-            adder
-        );
+            thrust::transform(
+                exec_policy,
+                device_tptr_cast<T>(vec.data()) + start,
+                device_tptr_cast<T>(vec.data()) + end,
+                device_tptr_cast<T>(vec.data()) + start,
+                adder
+            );
+        }
     }
 
     template<typename E>

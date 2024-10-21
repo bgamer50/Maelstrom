@@ -87,6 +87,7 @@ add_library(
     algorithms/impl/thrust/rebalance.cu
     algorithms/impl/thrust/shuffle.cu
     algorithms/impl/thrust/similarity.cu
+    algorithms/impl/thrust/topk.cu
     algorithms/impl/cuda/search_sorted_device.cu
     algorithms/impl/cuda/query_adjacency_device.cu
     algorithms/impl/cuda/search_sorted_sparse_device.cu
@@ -206,6 +207,7 @@ AddMaelstromTest(test_prefix_sum.exe tests/test_prefix_sum.cpp)
 AddMaelstromTest(test_hash_table.exe tests/test_hash_table.cpp)
 AddMaelstromTest(test_assign.exe tests/test_assign.cpp)
 AddMaelstromTest(test_similarity.exe tests/test_similarity.cpp)
+AddMaelstromTest(test_topk.exe tests/test_topk.cpp)
 
 AddMaelstromDistTest(test_dist_init.exe tests/dist/test_dist_init.cu)
 AddMaelstromDistTest(test_dist_arange.exe tests/dist/test_dist_arange.cu)
