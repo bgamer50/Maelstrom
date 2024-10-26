@@ -106,6 +106,8 @@ namespace maelstrom {
                 static_cast<double*>(dest.data()),
                 emb_stride
             );
+            cudaDeviceSynchronize();
+            maelstrom::cuda::cudaCheckErrors("k_cosine_similarity");
             
             return dest;
         } else {
