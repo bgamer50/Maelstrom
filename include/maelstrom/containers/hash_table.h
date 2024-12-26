@@ -1,6 +1,7 @@
 #pragma once
 
 #include "maelstrom/containers/vector.h"
+#include <optional>
 
 namespace maelstrom {
 
@@ -32,10 +33,19 @@ namespace maelstrom {
     maelstrom::vector get_hash_table(void* data, maelstrom::vector& keys, maelstrom::dtype_t val_dtype, bool return_values=true);
 
     /*
+        Returns the items in this has table.
+    */
+    template<maelstrom::storage S>
+    std::pair<std::optional<maelstrom::vector>, std::optional<maelstrom::vector>> get_hash_table_items(void* data, maelstrom::dtype_t key_dtype, maelstrom::dtype_t val_dtype, bool return_keys, bool return_values);
+
+    /*
         Removes the given keys and their values from the given hash table.
     */
     template<maelstrom::storage S>
     void remove_hash_table(void* data, maelstrom::vector& keys, maelstrom::dtype_t val_dtype);
+
+    template<maelstrom::storage S>
+    size_t size_hash_table(void* data, maelstrom::dtype_t key_dtype, maelstrom::dtype_t val_dtype);
 
     class hash_table {
         private:
@@ -58,6 +68,14 @@ namespace maelstrom {
             void remove(maelstrom::vector& keys);
 
             maelstrom::vector contains(maelstrom::vector& keys);
+
+            maelstrom::vector get_keys();
+
+            maelstrom::vector get_values();
+
+            std::pair<maelstrom::vector, maelstrom::vector> get_items();
+
+            size_t size();
 
             inline std::any key_not_found() { return maelstrom::max_value(this->key_dtype); }
 

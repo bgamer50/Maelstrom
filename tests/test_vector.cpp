@@ -56,4 +56,7 @@ void test_vector_basic() {
 
     val = m_i_data.get(2);
     assert( std::any_cast<int>(val) == 30 );
+
+    m_data.resize(4);
+    assert( m_data.size() == 4 );
 }

@@ -7,15 +7,17 @@
 
 using namespace maelstrom::test;
 
-void test_sort_basic();
-void test_sort_multi();
-void test_sort_mixed_int();
+void test_sort_basic(maelstrom::storage storage);
+void test_sort_multi(maelstrom::storage storage);
+void test_sort_mixed_int(maelstrom::storage storage);
 
 int main(int argc, char* argv[]) {
     try {
-        test_sort_basic();
-        test_sort_multi();
-        test_sort_mixed_int();
+        for(auto storage: {maelstrom::HOST, maelstrom::DEVICE, maelstrom::MANAGED}) {
+            test_sort_basic(storage);
+            test_sort_multi(storage);
+            test_sort_mixed_int(storage);
+        }
     } catch(std::exception& err) {
         std::cerr << "FAIL!" << std::endl;
         std::cerr << err.what() << std::endl;
@@ -25,11 +27,11 @@ int main(int argc, char* argv[]) {
     std::cout << "DONE!" << std::endl;
 }
 
-void test_sort_basic() {
+void test_sort_basic(maelstrom::storage storage) {
     std::vector<double> cpp_array = {9.1, 8.2, 4.3, 2.2, 4.5, 9.81};
 
     maelstrom::vector m_array(
-        maelstrom::storage::MANAGED,
+        storage,
         maelstrom::float64,
         cpp_array.data(),
         cpp_array.size(),
@@ -37,6 +39,8 @@ void test_sort_basic() {
     );
 
     auto sorted_ix = maelstrom::sort(m_array);
+    sorted_ix = sorted_ix.to(maelstrom::HOST);
+    m_array = m_array.to(maelstrom::HOST);
     
     std::vector<double> cpp_sorted_values = {2.2, 4.3, 4.5, 8.2, 9.1, 9.81};
     assert( m_array.size() == cpp_sorted_values.size() );
@@ -49,35 +53,35 @@ void test_sort_basic() {
     assert_array_equals(static_cast<size_t*>(sorted_ix.data()), cpp_sorted_ix.data(), cpp_sorted_ix.size());
 }
 
-void test_sort_multi() {
+void test_sort_multi(maelstrom::storage storage) {
     std::vector<double> a0 = {1.1, 2.1, 3.1, 1.1, 2.1, 2.1, 3.1, 2.1};
     std::vector<double> a1 = {5.5, 6.5, 7.5, 8.5, 9.5, 3.2, 7.5, 3.2};
     std::vector<double> a2 = {3.3, 3.3, 3.5, 4.3, 4.5, 1.2, 3.5, 8.6};
     std::vector<double> a3 = {1.1, 2.1, 3.1, 4.1, 5.6, 6.1, 2.1, 4.1};
 
     maelstrom::vector m_array_0(
-        maelstrom::storage::MANAGED,
+        storage,
         maelstrom::float64,
         a0.data(),
         a0.size(),
         false
     );
     maelstrom::vector m_array_1(
-        maelstrom::storage::MANAGED,
+        storage,
         maelstrom::float64,
         a1.data(),
         a1.size(),
         false
     );
     maelstrom::vector m_array_2(
-        maelstrom::storage::MANAGED,
+        storage,
         maelstrom::float64,
         a2.data(),
         a2.size(),
         false
     );
     maelstrom::vector m_array_3(
-        maelstrom::storage::MANAGED,
+        storage,
         maelstrom::float64,
         a3.data(),
         a3.size(),
@@ -89,7 +93,12 @@ void test_sort_multi() {
         std::ref(m_array_1),
         std::ref(m_array_2),
         std::ref(m_array_3)
-    });
+    }).to(maelstrom::HOST);
+
+    m_array_0 = m_array_0.to(maelstrom::HOST);
+    m_array_1 = m_array_1.to(maelstrom::HOST);
+    m_array_2 = m_array_2.to(maelstrom::HOST);
+    m_array_3 = m_array_3.to(maelstrom::HOST);
 
     std::vector<double> expected_0 = {1.1, 1.1, 2.1, 2.1, 2.1, 2.1, 3.1, 3.1};
     std::vector<double> expected_1 = {5.5, 8.5, 3.2, 3.2, 6.5, 9.5, 7.5, 7.5};
@@ -102,20 +111,24 @@ void test_sort_multi() {
     assert_array_equals(static_cast<double*>(m_array_3.data()), expected_3.data(), expected_3.size());
 }
 
-void test_sort_mixed_int() {
+void test_sort_mixed_int(maelstrom::storage storage) {
     std::vector<uint64_t> vec1 = {5ul, 0ul, 7ul, 6ul, 3ul, 2ul, 0ul, 9ul, 6ul, 6ul, 7ul};
     std::vector<uint32_t> vec2 = {5u , 5u , 5u , 1u , 2u , 3u , 5u , 4u , 3u , 2u , 1u };
     std::vector<uint64_t> vec3 = {7ul, 6ul, 5ul, 5ul, 6ul, 8ul, 7ul, 2ul, 3ul, 1ul, 7ul};
 
-    maelstrom::vector m_vec1(maelstrom::MANAGED, maelstrom::uint64, vec1.data(), vec1.size(), false);
-    maelstrom::vector m_vec2(maelstrom::MANAGED, maelstrom::uint32, vec2.data(), vec2.size(), false);
-    maelstrom::vector m_vec3(maelstrom::MANAGED, maelstrom::uint64, vec3.data(), vec3.size(), false);
+    maelstrom::vector m_vec1(storage, maelstrom::uint64, vec1.data(), vec1.size(), false);
+    maelstrom::vector m_vec2(storage, maelstrom::uint32, vec2.data(), vec2.size(), false);
+    maelstrom::vector m_vec3(storage, maelstrom::uint64, vec3.data(), vec3.size(), false);
 
     auto ix = maelstrom::sort({std::ref(m_vec1), std::ref(m_vec2), std::ref(m_vec3)});
 
     std::vector<uint64_t> expected_1 = {0, 0, 2, 3, 5, 6, 6, 6, 7, 7, 9};
     std::vector<uint32_t> expected_2 = {5, 5, 3, 2, 5, 1, 2, 3, 1, 5, 4};
     std::vector<uint64_t> expected_3 = {6, 7, 8, 6, 7, 5, 1, 3, 7, 5, 2};
+
+    m_vec1 = m_vec1.to(maelstrom::HOST);
+    m_vec2 = m_vec2.to(maelstrom::HOST);
+    m_vec3 = m_vec3.to(maelstrom::HOST);
 
     assert_array_equals(static_cast<uint64_t*>(m_vec1.data()), expected_1.data(), expected_1.size());
     assert_array_equals(static_cast<uint32_t*>(m_vec2.data()), expected_2.data(), expected_2.size());

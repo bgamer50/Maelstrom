@@ -1,5 +1,6 @@
 #include "maelstrom/containers/vector.h"
 #include "maelstrom/containers/hash_table.h"
+#include "maelstrom/algorithms/sort.h"
 #include "test_utils.hpp"
 
 #include <vector>
@@ -13,8 +14,8 @@ void test_hash_table_host();
 
 int main(int argc, char* argv[]) {
     try {
-        test_hash_table_device();
         test_hash_table_host();
+        test_hash_table_device();
     } catch(std::exception& err) {
         std::cerr << "FAIL!" << std::endl;
         std::cerr << err.what() << std::endl;
@@ -55,6 +56,8 @@ void test_hash_table_device() {
         m_vals
     );
 
+    assert ( table.size() == 8 );
+
     float not_found = std::any_cast<float>(table.val_not_found());
     std::vector<int> cpp_ret_keys = {6, 9, 11, -1, 2};
     std::vector<float> cpp_expected_vals = {1.3f, not_found, not_found, not_found, 0.5f};
@@ -74,7 +77,15 @@ void test_hash_table_device() {
 
     m_ret_vals = m_ret_vals.to(maelstrom::MANAGED);
     assert_array_equals(static_cast<float*>(m_ret_vals.data()), cpp_expected_vals.data(), cpp_expected_vals.size());
-    
+
+    std::vector<int> exp_keys = {0, 1, 2, 3, 4, 5, 6, 7};
+    maelstrom::vector all_keys = table.get_keys().to(maelstrom::HOST);
+    maelstrom::sort(all_keys);
+    assert_array_equals(exp_keys.data(), static_cast<int*>(all_keys.data()), all_keys.size());
+
+    maelstrom::vector all_vals = table.get_values().to(maelstrom::HOST);
+    for(size_t k = 0; k < all_vals.size(); ++k) assert ( std::find(cpp_vals.begin(), cpp_vals.end(), std::any_cast<float>(all_vals.get(k))) != cpp_vals.end() );
+
     std::vector<int> cpp_cnt_keys = {0, 3, 6, 9};
     std::vector<uint8_t> cpp_cnt_expected = {true, true, true, false};
     
@@ -129,6 +140,8 @@ void test_hash_table_host() {
         m_vals
     );
 
+    assert ( table.size() == 8 );
+
     float not_found = std::any_cast<float>(table.val_not_found());
     std::vector<int> cpp_ret_keys = {6, 9, 11, -1, 2};
     std::vector<float> cpp_expected_vals = {1.3f, not_found, not_found, not_found, 0.5f};
@@ -147,6 +160,14 @@ void test_hash_table_host() {
     assert( m_ret_vals.size() == 5);
 
     assert_array_equals(static_cast<float*>(m_ret_vals.data()), cpp_expected_vals.data(), cpp_expected_vals.size());
+
+    std::vector<int> exp_keys = {0, 1, 2, 3, 4, 5, 6, 7};
+    maelstrom::vector all_keys = table.get_keys();
+    maelstrom::sort(all_keys);
+    assert_array_equals(exp_keys.data(), static_cast<int*>(all_keys.data()), all_keys.size());
+
+    maelstrom::vector all_vals = table.get_values().to(maelstrom::HOST);
+    for(size_t k = 0; k < all_vals.size(); ++k) assert ( std::find(cpp_vals.begin(), cpp_vals.end(), std::any_cast<float>(all_vals.get(k))) != cpp_vals.end() );
     
     std::vector<int> cpp_cnt_keys = {0, 3, 6, 9};
     std::vector<uint8_t> cpp_cnt_expected = {true, true, true, false};

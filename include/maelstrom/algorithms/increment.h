@@ -5,7 +5,9 @@
 namespace maelstrom {
     enum inc_op {
         INCREMENT=0,
-        DECREMENT=1
+        DECREMENT=1,
+        MODULUS=2,
+        DIVIDE=3
     };
 
     /*
@@ -19,7 +21,7 @@ namespace maelstrom {
         If decrement=true, will decrement by the given value instead of incrementing.
     */
     inline void increment(maelstrom::vector& vec, std::any inc, maelstrom::inc_op op=INCREMENT) {
-        return increment(vec, inc, 0, vec.size(), op);
+        return increment(vec, inc, 0, vec.local_size(), op);
     }
 
     /*
@@ -27,6 +29,6 @@ namespace maelstrom {
         If decrement=true, will decrement all elements by 1 instead.
     */
    inline void increment(maelstrom::vector& vec, maelstrom::inc_op op=INCREMENT) {
-        return increment(vec, std::any(), 0, vec.size(), op);
+        return increment(vec, std::any(), 0, vec.local_size(), op);
    }
 }

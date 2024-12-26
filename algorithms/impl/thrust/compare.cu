@@ -9,13 +9,14 @@ namespace maelstrom {
         maelstrom::vector output(
             vec1.get_mem_type(),
             uint8,
-            vec1.size()
+            vec1.size(),
+            vec1.local_size()
         );
 
         thrust::transform(
             exec_policy,
             maelstrom::device_tptr_cast<T>(vec1.data()),
-            maelstrom::device_tptr_cast<T>(vec1.data()) + vec1.size(),
+            maelstrom::device_tptr_cast<T>(vec1.data()) + vec1.local_size(),
             maelstrom::device_tptr_cast<T>(vec2.data()),
             maelstrom::device_tptr_cast<uint8_t>(output.data()),
             maelstrom::compare_fn<T>{cmp, invert}

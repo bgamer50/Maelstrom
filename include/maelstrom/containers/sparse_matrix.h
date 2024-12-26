@@ -142,6 +142,23 @@ namespace maelstrom {
             virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix, maelstrom::vector& rel_types, bool return_inner=true, bool return_values=false, bool return_relations=false, bool return_1d_index_as_values=false) = 0;
 
             /*
+                Depending on the format of this matrix, this operation is slightly different.
+
+                For CSR, gets the count of the nonzero entries for each row specified in ix.
+                If there are no entries for a given row, then nothing is returned for that row.
+
+                For CSC, gets the count of the nonzero entries for each column specified in ix.
+                If there are no entries for a given column, the nothing is returned for that column.
+
+                For COO, this operation is invalid and will throw an exception.
+
+                In all cases, returns two vectors, where the first vector corresponds to the index
+                in ix for the row/col and the second vector corresponds to the nonzero count.
+                Nonzero counts will always be > 0 since empty rows/columns are omitted.
+            */
+            virtual std::pair<maelstrom::vector, maelstrom::vector> nnz_i(maelstrom::vector& ix, maelstrom::vector& rel_types) = 0;
+
+            /*
                 Sets (row, col) = val for each row/col/val in rows/cols/vals.
                 If vals is not provided, just sets the row/col (adjacency matrix).
                 Can optionally set relation too.
@@ -162,6 +179,10 @@ namespace maelstrom {
             virtual maelstrom::vector get_col() = 0;
             virtual maelstrom::vector get_val() = 0;
             virtual maelstrom::vector get_rel() = 0;
+
+            virtual void set_stream(std::any str) = 0;
+            virtual std::any get_stream() = 0;
+            virtual void clear_stream() = 0;
     };
 
     class basic_sparse_matrix: public sparse_matrix {
@@ -177,6 +198,8 @@ namespace maelstrom {
             size_t n_cols;
 
             bool sorted;
+
+            std::any stream;
         
         public:
             inline basic_sparse_matrix(maelstrom::vector rows, maelstrom::vector cols, maelstrom::vector values, maelstrom::vector relations, maelstrom::sparse_matrix_format fmt, size_t num_rows, size_t num_cols, bool sorted=false) {
@@ -189,6 +212,27 @@ namespace maelstrom {
                 this->n_cols = num_cols;
                 this->format = fmt;
                 this->sorted = sorted;
+                
+                this->stream = get_default_stream(this->row.get_mem_type());
+                this->row.set_stream(this->stream);
+                this->col.set_stream(this->stream);
+                this->val.set_stream(this->stream);
+                this->rel.set_stream(this->stream);
+            }
+
+            /*
+                Constructs a new basic sparse matrix as a copy of the given sparse matrix.
+            */
+            inline basic_sparse_matrix(maelstrom::sparse_matrix& spm) {
+                this->row = std::move(spm.get_row());
+                this->col = std::move(spm.get_col());
+                this->val = std::move(spm.get_val());
+                this->rel = std::move(spm.get_rel());
+
+                this->n_rows = spm.num_rows();
+                this->n_cols = spm.num_cols();
+                this->format = spm.get_format();
+                this->sorted = spm.is_sorted();
             }
 
             using sparse_matrix::has_values;
@@ -263,6 +307,9 @@ namespace maelstrom {
             using sparse_matrix::query_adjacency;
             virtual std::tuple<maelstrom::vector, maelstrom::vector, maelstrom::vector, maelstrom::vector> query_adjacency(maelstrom::vector& ix, maelstrom::vector& rel_types, bool return_inner=true, bool return_values=false, bool return_relations=false, bool return_1d_index_as_values=false);
 
+            using sparse_matrix::nnz_i;
+            std::pair<maelstrom::vector, maelstrom::vector> nnz_i(maelstrom::vector& ix, maelstrom::vector& rel_types);
+
             using sparse_matrix::set;
             virtual void set(maelstrom::vector new_rows, size_t new_num_rows, maelstrom::vector new_cols, size_t new_num_cols, maelstrom::vector new_vals=maelstrom::vector(), maelstrom::vector new_rels=maelstrom::vector());
 
@@ -270,6 +317,7 @@ namespace maelstrom {
             inline virtual void set_values(maelstrom::vector new_values) {
                 if(!new_values.empty() && (new_values.size() != this->num_nonzero())) throw std::runtime_error("Size of new values does not match number of nonzero elements!");
                 this->val = std::move(new_values);
+                this->val.set_stream(this->stream);
             }
 
             using sparse_matrix::to_csr;
@@ -292,6 +340,27 @@ namespace maelstrom {
 
             using sparse_matrix::get_rel;
             inline virtual maelstrom::vector get_rel() { return this->rel; }
+
+            using sparse_matrix::get_stream;
+            inline virtual std::any get_stream() { return this->stream; }
+
+            using sparse_matrix::set_stream;
+            inline virtual void set_stream(std::any str) {
+                this->stream = str;
+                this->row.set_stream(this->stream);
+                this->col.set_stream(this->stream);
+                this->val.set_stream(this->stream);
+                this->rel.set_stream(this->stream);
+            }
+
+            using sparse_matrix::clear_stream;
+            inline virtual void clear_stream() { 
+                this->stream = get_default_stream(this->row.get_mem_type()); 
+                this->row.clear_stream();
+                this->col.clear_stream();
+                this->val.clear_stream();
+                this->rel.clear_stream();
+            }
     };
 
 }

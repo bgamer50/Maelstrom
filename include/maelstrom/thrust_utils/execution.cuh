@@ -9,7 +9,7 @@
 
 namespace maelstrom {
 
-    typedef thrust::system::cuda::detail::par_t device_exec_t;
+    typedef thrust::cuda_cub::par_t::stream_attachment_type device_exec_t;
     typedef thrust::system::cpp::detail::par_t host_exec_t;
 
     class exec_policy {
@@ -17,8 +17,14 @@ namespace maelstrom {
             std::optional<device_exec_t> device_exec_policy = std::nullopt;
             std::optional<host_exec_t> host_exec_policy = std::nullopt;
         public:
-            exec_policy(bool device=true) {
-                if(device) this->device_exec_policy.emplace(thrust::device);
+            exec_policy(bool device=true, std::optional<cudaStream_t> stream=std::nullopt) {
+                if(device) {
+                    this->device_exec_policy.emplace(
+                        thrust::cuda::par.on(
+                            stream.value_or((cudaStream_t)cudaStreamDefault)
+                        )
+                    );
+                }
                 else this->host_exec_policy.emplace(thrust::host);
             }
 
@@ -38,13 +44,18 @@ namespace maelstrom {
     };
 
     inline exec_policy get_execution_policy(maelstrom::vector& vec) {
-        switch(vec.get_mem_type()) {
+        auto mem_type = vec.get_mem_type();
+        switch(maelstrom::single_storage_of(mem_type)) {
             case HOST:
-            case PINNED:
                 return exec_policy(false);
             case DEVICE:
-            case MANAGED:
-                return exec_policy(true);
+            case PINNED:
+            case MANAGED: {
+                std::optional<cudaStream_t> st = std::nullopt;
+                auto stream = vec.get_stream();
+                if(stream.has_value()) st.emplace(std::any_cast<cudaStream_t>(stream));
+                return exec_policy(true, st);
+            }
         }
 
         throw std::runtime_error("Illegal memory type!");

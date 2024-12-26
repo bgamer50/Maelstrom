@@ -2,20 +2,42 @@
 #include "maelstrom/thrust_utils/thrust_utils.cuh"
 #include "maelstrom/thrust_utils/execution.cuh"
 
+#include "maelstrom/dist_utils/dist_partition.cuh"
+
 namespace maelstrom {
 
     template <typename E, typename T>
     void t_fill_arange(E exec_policy, maelstrom::vector& vec, std::any start, std::any end, std::any inc) {
+        auto mem_type = vec.get_mem_type();
+        bool is_distributed = maelstrom::is_dist(mem_type);
+
         T t_start = std::any_cast<T>(start);
         T t_end = std::any_cast<T>(end);
         T t_inc = std::any_cast<T>(inc);
 
+        if(is_distributed) {
+            size_t global_num_values = static_cast<size_t>((t_end - t_start) / t_inc) + (((t_end - t_start) % t_inc) > 0 ? 1 : 0);
+
+            size_t p_start, p_end;
+            std::tie(p_start, p_end) = maelstrom::get_local_partition(global_num_values);
+            T old_start = t_start;
+            t_start = old_start + p_start * t_inc;
+            t_end = old_start + p_end * t_inc;
+
+            vec.resize(global_num_values);
+        }
+
         if(t_inc <= 0) throw std::runtime_error("increment must be > 0 for arange!");
-        if(t_start >= t_end) throw std::runtime_error("start must be < end for arange!");
+        if(t_start > t_end) throw std::runtime_error("start must be <= end for arange!");
+
+        if(t_start == t_end) {
+            return; // return empty
+        }
 
         size_t num_values = static_cast<size_t>((t_end - t_start) / t_inc) + (((t_end - t_start) % t_inc) > 0 ? 1 : 0);
-
-        vec.resize(num_values);
+        if(!is_distributed) {
+            vec.resize(num_values);
+        }
 
         maelstrom::unary_times_op<T> times_op;
         times_op.times_val = t_inc;

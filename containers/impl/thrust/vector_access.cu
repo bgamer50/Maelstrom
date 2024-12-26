@@ -1,20 +1,31 @@
 #include "maelstrom/containers/vector.h"
+#include "maelstrom/dist_utils/dist_partition.cuh"
 
 #include <vector>
 #include <sstream>
+#include <numeric>
+
+#include <iostream>
 
 #include <cuda_runtime.h>
+#include "nccl.h"
+
+#include "maelstrom/util/cuda_utils.cuh"
+#include "maelstrom/dist_utils/nccl_utils.cuh"
+#include "maelstrom/algorithms/prefix_sum.h"
+#include "maelstrom/algorithms/search_sorted.h"
 
 namespace maelstrom {
 
-    std::any vector::get(size_t i) {
+    std::any vector::get_local(size_t i) {
         if(i >= this->filled_size) throw std::out_of_range("Attempted to get element out of bounds!");
 
         size_t data_size = maelstrom::size_of(this->dtype);
         std::vector<unsigned char> raw_value(data_size);
         void* ptr = raw_value.data();
 
-        if(this->mem_type == maelstrom::storage::DEVICE) {
+        auto single_mem_type = maelstrom::single_storage_of(this->mem_type);
+        if(single_mem_type == maelstrom::storage::DEVICE) {
             cudaMemcpy(
                 ptr,
                 static_cast<unsigned char*>(this->data_ptr) + (data_size * i),
@@ -25,7 +36,16 @@ namespace maelstrom {
             ptr = static_cast<unsigned char*>(this->data_ptr) + (data_size * i);
         }
 
+        this->dtype.deserialize(ptr);
         return this->dtype.deserialize(ptr);
+    }
+
+    std::any vector::get(size_t i) {
+        if(maelstrom::is_dist(this->mem_type)) {
+            throw std::runtime_error("Calling get() is not supported in distributed processing.  Did you intend to call get_local()?");
+        }
+        
+        return get_local(i);
     }
 
     void vector::erase(size_t i) {

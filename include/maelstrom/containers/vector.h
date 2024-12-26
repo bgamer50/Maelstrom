@@ -19,6 +19,7 @@ namespace maelstrom {
             
             maelstrom::storage mem_type;
             maelstrom::dtype_t dtype;
+            std::any stream;
             
             bool view;
 
@@ -37,16 +38,20 @@ namespace maelstrom {
             // Default constructor; creates a blank device vector of FLOAT64 dtype
             vector();
 
-            // Creates a vector of size N unitialized values of the given data type and given memory type.
-            vector(maelstrom::storage mem_type, maelstrom::dtype_t dtype, size_t N);
+            // Creates a vector of global_size unitialized values of the given data type and given memory type.
+            vector(maelstrom::storage mem_type, maelstrom::dtype_t dtype, size_t global_size);
+
+            // Safely creates a vector of global_size unitialized values of the given data type and memory type,
+            // with the specificed local partition size.
+            vector(maelstrom::storage mem_type, maelstrom::dtype_t dtype, size_t global_size, size_t local_partition_size);
 
             // Creates a vector corresponding to the provided data.  If view=true then this vector is only a view
             // over the provided data.  If view=false then this vector will own a copy of the provided data.
-            vector(maelstrom::storage mem_type, maelstrom::dtype_t dtype, void* data, size_t N, bool view=true);
+            vector(maelstrom::storage mem_type, maelstrom::dtype_t dtype, void* data, size_t local_partition_size, bool view=true);
 
-            vector(vector& orig, bool view);
+            vector(const vector& orig, bool view);
 
-            vector(vector& orig);
+            vector(const vector& orig);
 
             ~vector();
 
@@ -54,19 +59,35 @@ namespace maelstrom {
             
             vector& operator=(vector&& other) noexcept;
 
-            vector& operator=(vector& other) noexcept;
+            vector& operator=(const vector& other) noexcept;
+
+            inline bool is_dist() { return maelstrom::is_dist(this->mem_type); }
 
             inline bool is_view() { return this->view; }
+
+            /*
+                Pins the memory viewed by this vector.  If this vector is not a host view,
+                an exception is thrown.
+            */
+            void pin();
+
+            /*
+                Unpins the memory viewed by this vector.  If this vector is not a host view,
+                an exception is thrown.
+            */
+            void unpin();
 
             void push_back();
 
             void reserve(size_t N);
+            void reserve_local(size_t N);
 
             /*
                 At position ix_start in this vector, adds the elements in the given vector
                 in the range [add_ix_start, add_ix_end).
             */
             void insert(size_t ix_start, vector& new_elements, size_t add_ix_start, size_t add_ix_end);
+            void insert_local(size_t ix_start, vector& new_elements, size_t add_ix_start, size_t add_ix_end);
 
             /*
                 At position ix_start in this vector, add all elements in the given vector.
@@ -74,12 +95,18 @@ namespace maelstrom {
             inline void insert(size_t ix_start, vector& new_elements) {
                 return this->insert(ix_start, new_elements, 0, new_elements.size());
             }
+            inline void insert_local(size_t ix_start, vector& new_elements) {
+                return this->insert_local(ix_start, new_elements, 0, new_elements.size());
+            }
 
             /*
                 At the end of this vector, add all elements in the given vector.
             */
             inline void insert(vector& new_elements) {
                 return this->insert(this->size(), new_elements, 0, new_elements.size());
+            }
+            inline void insert_local(vector& new_elements) {
+                return this->insert_local(this->size(), new_elements, 0, new_elements.size());
             }
 
             /*
@@ -93,6 +120,11 @@ namespace maelstrom {
             std::any get(size_t i);
 
             /*
+                Gets the value at the given local index.
+            */
+            std::any get_local(size_t i);
+
+            /*
                 Empties the contents of this vector and frees any reserved memory.
             */
             void clear();
@@ -102,9 +134,11 @@ namespace maelstrom {
             */
             void print();
             
-            inline size_t size() { return this->filled_size; }
+            size_t size();
 
-            inline bool empty() { return this->filled_size == 0; }
+            inline size_t local_size() { return this->filled_size; }
+
+            inline bool empty() { return this->data_ptr == nullptr || this->size() == 0; }
 
             inline void* data() {
                 return this->data_ptr;
@@ -132,8 +166,29 @@ namespace maelstrom {
             }
 
             void resize(size_t N);
+            void resize_local(size_t N);
 
             void shrink_to_fit();
+
+            /*
+                Sets the stream of this vector.  Affects the maelstrom execution policy.
+                The meaning of a stream differs depending on the storage (device, host, distributed, etc.)
+                of this vector.
+            */
+            inline void set_stream(std::any stream) {
+                this->stream = stream;
+            }
+
+            inline std::any get_stream() {
+                return this->stream;
+            }
+
+            /*
+                Restores the default stream.
+            */
+            inline void clear_stream() {
+                this->stream = get_default_stream(this->mem_type);
+            }
 
             /*
                 Elementwise sum of two vectors
@@ -185,16 +240,35 @@ namespace maelstrom {
     */
     maelstrom::vector as_primitive_vector(maelstrom::vector& vec, bool view=true);
 
-    /*
-        Makes a new emtpy vector with the same memory type and data type as the given vector.
+   /*
+       Makes a new emtpy vector with the same memory type and data type as the given vector.
         
-    */
+   */
    inline maelstrom::vector make_vector_like(maelstrom::vector& vec) {
         return maelstrom::vector(
             vec.get_mem_type(),
             vec.get_dtype()
         );
    }
+
+   /*
+        Returns a view of the local partition of the given distributed vector.
+   */
+   inline maelstrom::vector local_view_of(maelstrom::vector& vec) {
+        return maelstrom::vector(
+            maelstrom::single_storage_of(vec.get_mem_type()),
+            vec.get_dtype(),
+            vec.data(),
+            vec.local_size(),
+            true
+        );
+    }
+
+    /*
+        Converts the vector to a distributed vector of the given memory type
+        and returns it.
+    */
+    maelstrom::vector to_dist_vector(maelstrom::vector vec);
 
    /*
         Makes a new vector of appropriate data type from the given vector of anys

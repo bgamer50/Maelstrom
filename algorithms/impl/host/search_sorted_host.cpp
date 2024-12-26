@@ -8,11 +8,11 @@ namespace maelstrom {
         T* sorted_array = static_cast<T*>(sorted_array_vector.data());
         T* values_to_find = static_cast<T*>(values_to_find_vector.data());
 
-        maelstrom::vector output_vector(sorted_array_vector.get_mem_type(), uint64, values_to_find_vector.size());
+        maelstrom::vector output_vector(values_to_find_vector.get_mem_type(), uint64, values_to_find_vector.size(), values_to_find_vector.local_size());
         size_t* output = static_cast<size_t*>(output_vector.data());
 
         // TODO parallelize
-        for(size_t k = 0; k < values_to_find_vector.size(); ++k) {
+        for(size_t k = 0; k < values_to_find_vector.local_size(); ++k) {
             const T value = values_to_find[k];
 
             size_t left = 0;

@@ -32,9 +32,9 @@ namespace maelstrom {
 
     template <typename E, typename T>
     maelstrom::vector launch_search_sorted_cuda(E exec_policy, maelstrom::vector& sorted_array, maelstrom::vector& values_to_find) {
-        maelstrom::vector output(sorted_array.get_mem_type(), uint64, values_to_find.size());
+        maelstrom::vector output(values_to_find.get_mem_type(), uint64, values_to_find.size(), values_to_find.local_size());
 
-        const size_t sz = values_to_find.size();
+        const size_t sz = values_to_find.local_size(); // values_to_find may be distributed
         const size_t num_blocks = maelstrom::cuda::num_blocks(sz, MAELSTROM_DEFAULT_BLOCK_SIZE);
 
         k_search_sorted<<<num_blocks, MAELSTROM_DEFAULT_BLOCK_SIZE>>>(
